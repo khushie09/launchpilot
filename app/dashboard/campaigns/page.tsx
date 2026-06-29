@@ -1,5 +1,5 @@
 import { Plus, TrendingUp } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -29,177 +29,191 @@ const platformConfig: Record<string, { bg: string; text: string }> = {
   LinkedIn:  { bg: 'rgba(96,165,250,0.08)',  text: '#60a5fa' },
 }
 
-const summaryCards: { label: CampaignStatus; color: string }[] = [
-  { label: 'Active',    color: '#22c55e' },
-  { label: 'Review',    color: '#f59e0b' },
-  { label: 'Draft',     color: '#71717a' },
-  { label: 'Completed', color: '#6366f1' },
-]
-
 const statusCounts = campaigns.reduce(
   (acc, c) => ({ ...acc, [c.status]: (acc[c.status] ?? 0) + 1 }),
   {} as Record<string, number>
 )
 
-const cardStyle = {
+const card = {
   background: '#0f0f13',
-  boxShadow: '0 1px 2px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
+  border: '1px solid rgba(255,255,255,0.055)',
+  borderRadius: 14,
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 export default function CampaignsPage() {
   return (
-    <div className="space-y-6 p-8">
+    <div style={{ padding: '48px', maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
 
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Campaigns</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {campaigns.length} campaigns · {statusCounts['Active'] ?? 0} active
-          </p>
-        </div>
-        <Button
-          className="gap-2 text-[13px] font-medium"
-          style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none' }}
-        >
-          <Plus size={14} strokeWidth={2.5} />
-          New Campaign
-        </Button>
-      </div>
-
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {summaryCards.map(({ label, color }) => (
-          <Card key={label} className="border-border/60" style={cardStyle}>
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="h-2 w-2 rounded-full" style={{ background: color }} />
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60">
-                  {label}
-                </p>
-              </div>
-              <p className="text-3xl font-semibold tracking-tight text-foreground">
-                {statusCounts[label] ?? 0}
-              </p>
-              <p className="mt-1 text-[11px] text-muted-foreground/50">campaigns</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Table */}
-      <Card className="border-border/60" style={cardStyle}>
-        <CardHeader className="border-b border-border/40 pb-3.5 pt-4 px-5">
-          <CardTitle className="text-[13px] font-semibold text-foreground tracking-tight">
-            All Campaigns
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border/40 hover:bg-transparent">
-                  {['Campaign', 'Creator', 'Platform', 'Status', 'Budget', 'Spend', 'Reach'].map((h) => (
-                    <TableHead
-                      key={h}
-                      className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/40 first:pl-5 last:pr-5"
-                    >
-                      {h}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {campaigns.map((c) => {
-                  const sc = statusConfig[c.status]
-                  const pc = platformConfig[c.platform] ?? { bg: 'rgba(113,113,122,0.08)', text: '#a1a1aa' }
-                  const spendPct = c.budget > 0 ? Math.round((c.spent / c.budget) * 100) : 0
-                  return (
-                    <TableRow
-                      key={c.id}
-                      className="border-border/30 cursor-pointer transition-colors hover:bg-muted/40"
-                    >
-                      <TableCell className="pl-5 py-4">
-                        <p className="text-[13px] font-medium text-foreground leading-none">{c.name}</p>
-                        <p className="mt-1 text-[11px] text-muted-foreground/60">{c.brand}</p>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <div className="flex items-center gap-2">
-                          <Avatar className="h-6 w-6">
-                            <AvatarFallback
-                              className="text-[10px] font-medium"
-                              style={{ background: 'rgba(99,102,241,0.15)', color: '#818cf8' }}
-                            >
-                              {c.creatorAvatar}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-[12px] text-muted-foreground">{c.creator}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <span
-                          className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium"
-                          style={{ background: pc.bg, color: pc.text }}
-                        >
-                          {c.platform}
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <span
-                          className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium"
-                          style={{ background: sc.bg, color: sc.text }}
-                        >
-                          <span className="h-1.5 w-1.5 rounded-full" style={{ background: sc.dot }} />
-                          {c.status}
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-4 font-mono text-[12px] text-muted-foreground">
-                        ${c.budget.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="py-4">
-                        {c.spent > 0 ? (
-                          <div className="space-y-1.5">
-                            <span className="font-mono text-[12px] text-muted-foreground">
-                              ${c.spent.toLocaleString()}
-                            </span>
-                            <div className="h-1 w-20 overflow-hidden rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                              <div
-                                className="h-full rounded-full"
-                                style={{
-                                  width: `${spendPct}%`,
-                                  background: spendPct > 90
-                                    ? '#f87171'
-                                    : spendPct > 70
-                                      ? '#fbbf24'
-                                      : '#818cf8',
-                                }}
-                              />
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-[12px] text-muted-foreground/30">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="pr-5 py-4">
-                        {c.reach !== '—' ? (
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-mono text-[12px] text-muted-foreground">{c.reach}</span>
-                            <TrendingUp size={10} className="text-emerald-400" />
-                            <span className="text-[11px] text-emerald-400">{c.engagement}</span>
-                          </div>
-                        ) : (
-                          <span className="text-[12px] text-muted-foreground/30">—</span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div>
+            <h1 style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5', lineHeight: 1.1 }}>
+              Campaigns
+            </h1>
+            <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 16 }}>
+              {(['Active', 'Review', 'Draft', 'Completed'] as CampaignStatus[]).map((s) => {
+                const c = statusConfig[s]
+                const count = statusCounts[s] ?? 0
+                return (
+                  <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ height: 6, width: 6, borderRadius: '50%', background: c.dot, flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, color: '#71717a' }}>{count} {s.toLowerCase()}</span>
+                  </div>
+                )
+              })}
+            </div>
           </div>
-        </CardContent>
-      </Card>
+          <Button
+            className="gap-2 text-[13px] font-medium"
+            style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none', height: 38 }}
+          >
+            <Plus size={14} strokeWidth={2.5} />
+            New Campaign
+          </Button>
+        </div>
+
+        {/* Table */}
+        <Card style={card}>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow style={{ borderColor: 'rgba(255,255,255,0.05)' }} className="hover:bg-transparent">
+                    {[
+                      { label: 'Campaign', pl: 32 },
+                      { label: 'Creator' },
+                      { label: 'Platform' },
+                      { label: 'Status' },
+                      { label: 'Budget' },
+                      { label: 'Spend' },
+                      { label: 'Reach' },
+                    ].map((h) => (
+                      <TableHead
+                        key={h.label}
+                        style={{
+                          paddingLeft: h.pl,
+                          paddingTop: 18,
+                          paddingBottom: 18,
+                          fontSize: 11,
+                          fontWeight: 500,
+                          textTransform: 'uppercase' as const,
+                          letterSpacing: '0.07em',
+                          color: '#3f3f46',
+                        }}
+                      >
+                        {h.label}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {campaigns.map((c) => {
+                    const sc = statusConfig[c.status]
+                    const pc = platformConfig[c.platform] ?? { bg: 'rgba(113,113,122,0.08)', text: '#a1a1aa' }
+                    const spendPct = c.budget > 0 ? Math.round((c.spent / c.budget) * 100) : 0
+                    return (
+                      <TableRow
+                        key={c.id}
+                        style={{ borderColor: 'rgba(255,255,255,0.04)', cursor: 'pointer' }}
+                        className="transition-colors hover:bg-muted/40"
+                      >
+                        <TableCell style={{ paddingLeft: 32, paddingTop: 22, paddingBottom: 22 }}>
+                          <p style={{ fontSize: 13, fontWeight: 500, color: '#e4e4e7', lineHeight: 1 }}>{c.name}</p>
+                          <p style={{ marginTop: 5, fontSize: 12, color: '#52525b' }}>{c.brand}</p>
+                        </TableCell>
+                        <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <Avatar className="h-7 w-7">
+                              <AvatarFallback
+                                style={{ background: 'rgba(99,102,241,0.12)', color: '#818cf8', fontSize: 10, fontWeight: 600 }}
+                              >
+                                {c.creatorAvatar}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span style={{ fontSize: 13, color: '#a1a1aa' }}>{c.creator}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              borderRadius: 20,
+                              padding: '4px 10px',
+                              fontSize: 11,
+                              fontWeight: 500,
+                              background: pc.bg,
+                              color: pc.text,
+                            }}
+                          >
+                            {c.platform}
+                          </span>
+                        </TableCell>
+                        <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 6,
+                              borderRadius: 20,
+                              padding: '4px 10px',
+                              fontSize: 11,
+                              fontWeight: 500,
+                              background: sc.bg,
+                              color: sc.text,
+                            }}
+                          >
+                            <span style={{ height: 6, width: 6, borderRadius: '50%', background: sc.dot, flexShrink: 0 }} />
+                            {c.status}
+                          </span>
+                        </TableCell>
+                        <TableCell style={{ paddingTop: 22, paddingBottom: 22, fontFamily: 'monospace', fontSize: 13, color: '#a1a1aa' }}>
+                          ${c.budget.toLocaleString()}
+                        </TableCell>
+                        <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                          {c.spent > 0 ? (
+                            <div>
+                              <span style={{ fontFamily: 'monospace', fontSize: 13, color: '#a1a1aa' }}>
+                                ${c.spent.toLocaleString()}
+                              </span>
+                              <div style={{ marginTop: 6, height: 3, width: 80, borderRadius: 2, background: 'rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+                                <div
+                                  style={{
+                                    height: '100%',
+                                    borderRadius: 2,
+                                    width: `${spendPct}%`,
+                                    background: spendPct > 90 ? '#f87171' : spendPct > 70 ? '#fbbf24' : '#818cf8',
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <span style={{ fontSize: 12, color: '#3f3f46' }}>—</span>
+                          )}
+                        </TableCell>
+                        <TableCell style={{ paddingRight: 32, paddingTop: 22, paddingBottom: 22 }}>
+                          {c.reach !== '—' ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ fontFamily: 'monospace', fontSize: 13, color: '#a1a1aa' }}>{c.reach}</span>
+                              <TrendingUp size={10} style={{ color: '#4ade80' }} />
+                              <span style={{ fontSize: 12, color: '#4ade80' }}>{c.engagement}</span>
+                            </div>
+                          ) : (
+                            <span style={{ fontSize: 12, color: '#3f3f46' }}>—</span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+      </div>
     </div>
   )
 }

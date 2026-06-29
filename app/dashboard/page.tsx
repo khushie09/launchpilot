@@ -1,8 +1,7 @@
 import { TrendingUp, TrendingDown, ArrowRight, DollarSign, Megaphone, Users, Clock } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -18,8 +17,14 @@ import {
   recentActivity,
   monthlyRevenue,
   type CampaignStatus,
-  type Activity,
 } from '@/lib/mock-data'
+
+// ── Shared tokens ─────────────────────────────────────────────────────────────
+const card = {
+  background: '#0f0f13',
+  border: '1px solid rgba(255,255,255,0.055)',
+  borderRadius: 14,
+}
 
 // ── Status badge ──────────────────────────────────────────────────────────────
 const statusConfig: Record<CampaignStatus, { bg: string; text: string; dot: string }> = {
@@ -43,66 +48,48 @@ function StatusBadge({ status }: { status: CampaignStatus }) {
   )
 }
 
-// ── Activity icon map ─────────────────────────────────────────────────────────
-const activityConfig: Record<Activity['type'], { bg: string; border: string }> = {
-  content_approved:   { bg: 'rgba(34,197,94,0.12)',   border: 'rgba(34,197,94,0.25)'   },
-  payment_sent:       { bg: 'rgba(59,130,246,0.12)',  border: 'rgba(59,130,246,0.25)'  },
-  creator_joined:     { bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.25)' },
-  campaign_created:   { bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.25)'  },
-  campaign_completed: { bg: 'rgba(99,102,241,0.12)',  border: 'rgba(99,102,241,0.25)'  },
-  brief_sent:         { bg: 'rgba(125,211,252,0.12)', border: 'rgba(125,211,252,0.25)' },
-}
-
-const activityDotColor: Record<Activity['type'], string> = {
-  content_approved:   '#22c55e',
-  payment_sent:       '#3b82f6',
-  creator_joined:     '#a78bfa',
-  campaign_created:   '#f59e0b',
-  campaign_completed: '#6366f1',
-  brief_sent:         '#7dd3fc',
-}
-
-// ── KPI icon map ─────────────────────────────────────────────────────────────
+// ── KPI config ────────────────────────────────────────────────────────────────
 const kpiIcons = [
-  { icon: DollarSign, color: '#4ade80', bg: 'rgba(34,197,94,0.1)'   },
-  { icon: Megaphone,  color: '#818cf8', bg: 'rgba(99,102,241,0.1)'  },
-  { icon: Users,      color: '#a78bfa', bg: 'rgba(167,139,250,0.1)' },
-  { icon: Clock,      color: '#fbbf24', bg: 'rgba(245,158,11,0.1)'  },
+  { icon: DollarSign, color: '#4ade80' },
+  { icon: Megaphone,  color: '#818cf8' },
+  { icon: Users,      color: '#a78bfa' },
+  { icon: Clock,      color: '#fbbf24' },
 ]
 
 // ── Revenue chart ─────────────────────────────────────────────────────────────
 function RevenueChart() {
   const max = Math.max(...monthlyRevenue.map((d) => d.revenue))
-  const barH = 160
+  const barH = 200
 
   return (
-    <div className="flex items-end gap-1" style={{ height: barH + 24 }}>
+    <div className="flex items-end gap-1.5" style={{ height: barH + 28 }}>
       {monthlyRevenue.map((d, i) => {
         const pct = (d.revenue / max) * 100
         const isRecent = i >= monthlyRevenue.length - 3
         const isCurrent = i === monthlyRevenue.length - 1
         return (
-          <div key={d.month} className="group flex flex-1 flex-col items-center gap-1">
+          <div key={d.month} className="group flex flex-1 flex-col items-center gap-2">
             <div className="relative w-full" style={{ height: barH }}>
               <div
-                className="absolute bottom-0 w-full rounded-t-sm transition-all duration-200 group-hover:opacity-80"
+                className="absolute bottom-0 w-full transition-all duration-200 group-hover:opacity-75"
                 style={{
                   height: `${pct}%`,
                   background: isCurrent
-                    ? 'linear-gradient(180deg, #818cf8 0%, rgba(99,102,241,0.5) 100%)'
+                    ? 'linear-gradient(180deg, #818cf8 0%, rgba(99,102,241,0.4) 100%)'
                     : isRecent
-                      ? 'rgba(99,102,241,0.18)'
-                      : 'rgba(255,255,255,0.05)',
+                      ? 'rgba(99,102,241,0.16)'
+                      : 'rgba(255,255,255,0.045)',
                   border: isCurrent
-                    ? '1px solid rgba(99,102,241,0.4)'
+                    ? '1px solid rgba(129,140,248,0.35)'
                     : isRecent
-                      ? '1px solid rgba(99,102,241,0.12)'
+                      ? '1px solid rgba(99,102,241,0.1)'
                       : '1px solid rgba(255,255,255,0.04)',
                   borderBottom: 'none',
+                  borderRadius: '3px 3px 0 0',
                 }}
               />
             </div>
-            <span className="text-[10px] text-muted-foreground/50">{d.month}</span>
+            <span className="text-[10px] text-muted-foreground/40">{d.month}</span>
           </div>
         )
       })}
@@ -115,247 +102,189 @@ export default function DashboardOverview() {
   const recentCampaigns = campaigns.slice(0, 5)
 
   return (
-    <div className="space-y-6 p-8">
+    <div style={{ padding: '48px', maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 56 }}>
 
-      {/* Page header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            Overview
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Monday, June 29, 2026 · 4 active campaigns running
-          </p>
-        </div>
-        <Link href="/dashboard/campaigns">
-          <Button
-            className="gap-2 text-[13px] font-medium"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none' }}
-          >
-            New Campaign
-            <ArrowRight size={14} strokeWidth={2} />
-          </Button>
-        </Link>
-      </div>
-
-      {/* KPI cards */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {overviewStats.map((stat, i) => {
-          const kpi = kpiIcons[i]
-          const Icon = kpi.icon
-          return (
-            <Card
-              key={stat.title}
-              className="border-border/60 transition-all duration-200 hover:border-border"
-              style={{
-                background: '#0f0f13',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
-              }}
+        {/* ── 1. Header ────────────────────────────────────────────────────── */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div>
+            <h1 style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5', lineHeight: 1.1 }}>
+              Overview
+            </h1>
+            <p style={{ marginTop: 8, fontSize: 14, color: '#71717a' }}>
+              Monday, June 29, 2026 · 4 active campaigns
+            </p>
+          </div>
+          <Link href="/dashboard/campaigns">
+            <Button
+              className="gap-2 text-[13px] font-medium"
+              style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none', height: 38 }}
             >
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between">
-                  <p className="text-[12px] font-medium text-muted-foreground leading-none">
+              New Campaign
+              <ArrowRight size={14} strokeWidth={2} />
+            </Button>
+          </Link>
+        </div>
+
+        {/* ── 2. KPI cards ─────────────────────────────────────────────────── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+          {overviewStats.map((stat, i) => {
+            const kpi = kpiIcons[i]
+            const Icon = kpi.icon
+            return (
+              <div key={stat.title} style={{ ...card, padding: '28px 28px 24px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
+                  <p style={{ fontSize: 11, fontWeight: 500, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     {stat.title}
                   </p>
-                  <div
-                    className="flex h-7 w-7 items-center justify-center rounded-lg"
-                    style={{ background: kpi.bg }}
-                  >
-                    <Icon size={13} strokeWidth={2} style={{ color: kpi.color }} />
-                  </div>
+                  <Icon size={14} strokeWidth={1.8} style={{ color: '#3f3f46', flexShrink: 0 }} />
                 </div>
-                <p className="mt-3 text-[28px] font-semibold tracking-tight text-foreground leading-none">
+                <p style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-0.035em', color: '#f4f4f5', lineHeight: 1 }}>
                   {stat.value}
                 </p>
-                <div className="mt-3 flex items-center gap-1.5">
+                <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 5 }}>
                   {stat.trend === 'up'
-                    ? <TrendingUp size={11} className="text-emerald-400" />
-                    : <TrendingDown size={11} className="text-red-400" />
+                    ? <TrendingUp size={11} strokeWidth={2} style={{ color: '#4ade80' }} />
+                    : <TrendingDown size={11} strokeWidth={2} style={{ color: '#f87171' }} />
                   }
-                  <span className={`text-[11px] font-semibold ${stat.trend === 'up' ? 'text-emerald-400' : 'text-red-400'}`}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: stat.trend === 'up' ? '#4ade80' : '#f87171' }}>
                     {stat.change}
                   </span>
-                  <span className="text-[11px] text-muted-foreground/60">{stat.sub}</span>
+                  <span style={{ fontSize: 12, color: '#52525b' }}>{stat.sub}</span>
                 </div>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+              </div>
+            )
+          })}
+        </div>
 
-      {/* Revenue chart — full width */}
-      <Card
-        className="border-border/60"
-        style={{
-          background: '#0f0f13',
-          boxShadow: '0 1px 2px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
-        }}
-      >
-        <CardHeader className="border-b border-border/40 pb-4">
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/50">
-                Revenue
-              </p>
-              <p className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
-                $84,320
-              </p>
-              <p className="mt-1 flex items-center gap-1 text-[12px] text-emerald-400">
-                <TrendingUp size={12} strokeWidth={2} />
-                +12.5% from last month
-              </p>
+        {/* ── 3. Revenue chart ─────────────────────────────────────────────── */}
+        <div style={card}>
+          <div style={{ padding: '28px 32px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 500, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Revenue
+                </p>
+                <p style={{ marginTop: 6, fontSize: 32, fontWeight: 700, letterSpacing: '-0.03em', color: '#f4f4f5', lineHeight: 1 }}>
+                  $84,320
+                </p>
+                <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <TrendingUp size={12} strokeWidth={2} style={{ color: '#4ade80' }} />
+                  <span style={{ fontSize: 12, color: '#4ade80', fontWeight: 500 }}>+12.5% from last month</span>
+                </div>
+              </div>
+              <span style={{ fontSize: 12, color: '#3f3f46' }}>Jan – Dec 2026</span>
             </div>
-            <span className="text-[12px] text-muted-foreground/50">Jan – Dec 2026</span>
           </div>
-        </CardHeader>
-        <CardContent className="px-5 pt-5 pb-4">
-          <RevenueChart />
-        </CardContent>
-      </Card>
+          <div style={{ padding: '28px 32px 24px' }}>
+            <RevenueChart />
+          </div>
+        </div>
 
-      {/* Two-column: campaigns + activity */}
-      <div className="grid gap-4 xl:grid-cols-5">
-
-        {/* Recent campaigns — 3/5 width */}
-        <Card
-          className="border-border/60 xl:col-span-3"
-          style={{
-            background: '#0f0f13',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
-          }}
-        >
-          <CardHeader className="flex flex-row items-center justify-between border-b border-border/40 pb-3.5 pt-4 px-5">
-            <CardTitle className="text-[13px] font-semibold text-foreground tracking-tight">
+        {/* ── 4. Recent campaigns ──────────────────────────────────────────── */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.015em', color: '#f4f4f5' }}>
               Recent Campaigns
-            </CardTitle>
+            </h2>
             <Link
               href="/dashboard/campaigns"
-              className="flex items-center gap-1 text-[11px] text-muted-foreground/60 transition-colors hover:text-foreground no-underline"
+              className="no-underline"
+              style={{ fontSize: 13, color: '#52525b', display: 'flex', alignItems: 'center', gap: 4 }}
             >
-              View all <ArrowRight size={10} strokeWidth={2} />
+              View all <ArrowRight size={12} strokeWidth={1.8} />
             </Link>
-          </CardHeader>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border/40 hover:bg-transparent">
-                  <TableHead className="pl-5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/40">
-                    Campaign
-                  </TableHead>
-                  <TableHead className="hidden sm:table-cell text-[10px] font-medium uppercase tracking-wider text-muted-foreground/40">
-                    Creator
-                  </TableHead>
-                  <TableHead className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/40">
-                    Status
-                  </TableHead>
-                  <TableHead className="pr-5 text-right text-[10px] font-medium uppercase tracking-wider text-muted-foreground/40">
-                    Budget
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentCampaigns.map((c) => (
-                  <TableRow
-                    key={c.id}
-                    className="border-border/30 cursor-pointer transition-colors hover:bg-muted/40"
-                  >
-                    <TableCell className="pl-5 py-4">
-                      <p className="text-[13px] font-medium text-foreground leading-none">
-                        {c.name}
-                      </p>
-                      <p className="mt-1 text-[11px] text-muted-foreground/60">{c.brand}</p>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell py-4">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarFallback
-                            className="text-[10px] font-medium"
-                            style={{ background: 'rgba(99,102,241,0.15)', color: '#818cf8' }}
-                          >
-                            {c.creatorAvatar}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-[12px] text-muted-foreground">{c.creator}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <StatusBadge status={c.status} />
-                    </TableCell>
-                    <TableCell className="pr-5 text-right py-4 font-mono text-[12px] text-muted-foreground">
-                      ${c.budget.toLocaleString()}
-                    </TableCell>
+          </div>
+          <Card style={card}>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow style={{ borderColor: 'rgba(255,255,255,0.05)' }} className="hover:bg-transparent">
+                    <TableHead style={{ paddingLeft: 28, paddingTop: 16, paddingBottom: 16, fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#3f3f46' }}>
+                      Campaign
+                    </TableHead>
+                    <TableHead style={{ paddingTop: 16, paddingBottom: 16, fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#3f3f46' }}>
+                      Creator
+                    </TableHead>
+                    <TableHead style={{ paddingTop: 16, paddingBottom: 16, fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#3f3f46' }}>
+                      Status
+                    </TableHead>
+                    <TableHead style={{ paddingRight: 28, paddingTop: 16, paddingBottom: 16, fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#3f3f46', textAlign: 'right' }}>
+                      Budget
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                </TableHeader>
+                <TableBody>
+                  {recentCampaigns.map((c) => (
+                    <TableRow
+                      key={c.id}
+                      style={{ borderColor: 'rgba(255,255,255,0.04)', cursor: 'pointer' }}
+                      className="transition-colors hover:bg-muted/40"
+                    >
+                      <TableCell style={{ paddingLeft: 28, paddingTop: 22, paddingBottom: 22 }}>
+                        <p style={{ fontSize: 13, fontWeight: 500, color: '#e4e4e7', lineHeight: 1 }}>
+                          {c.name}
+                        </p>
+                        <p style={{ marginTop: 5, fontSize: 12, color: '#52525b' }}>{c.brand}</p>
+                      </TableCell>
+                      <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback
+                              style={{ background: 'rgba(99,102,241,0.12)', color: '#818cf8', fontSize: 10, fontWeight: 600 }}
+                            >
+                              {c.creatorAvatar}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span style={{ fontSize: 13, color: '#a1a1aa' }}>{c.creator}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                        <StatusBadge status={c.status} />
+                      </TableCell>
+                      <TableCell style={{ paddingRight: 28, paddingTop: 22, paddingBottom: 22, textAlign: 'right', fontFamily: 'monospace', fontSize: 13, color: '#a1a1aa' }}>
+                        ${c.budget.toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* Activity feed — 2/5 width */}
-        <Card
-          className="border-border/60 xl:col-span-2"
-          style={{
-            background: '#0f0f13',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
-          }}
-        >
-          <CardHeader className="border-b border-border/40 pb-3.5 pt-4 px-5">
-            <CardTitle className="text-[13px] font-semibold text-foreground tracking-tight">
-              Recent Activity
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="relative">
-              {/* Timeline line */}
+        {/* ── 5. Recent activity ────────────────────────────────────────────── */}
+        <div>
+          <h2 style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.015em', color: '#f4f4f5', marginBottom: 20 }}>
+            Recent Activity
+          </h2>
+          <div style={card}>
+            {recentActivity.map((item, idx) => (
               <div
-                className="absolute left-[28px] top-4 bottom-4 w-px"
-                style={{ background: 'rgba(255,255,255,0.06)' }}
-              />
-
-              {recentActivity.map((item, idx) => (
-                <div
-                  key={item.id}
-                  className="relative flex items-start gap-3 px-5 py-3.5"
-                  style={{
-                    borderBottom: idx < recentActivity.length - 1
-                      ? '1px solid rgba(255,255,255,0.04)'
-                      : 'none',
-                  }}
-                >
-                  {/* Avatar / dot */}
-                  <div className="relative z-10 mt-0.5 shrink-0">
-                    {item.avatar ? (
-                      <Avatar className="h-7 w-7">
-                        <AvatarFallback
-                          className="text-[10px] font-medium"
-                          style={{ background: activityConfig[item.type].bg, color: activityDotColor[item.type] }}
-                        >
-                          {item.avatar}
-                        </AvatarFallback>
-                      </Avatar>
-                    ) : (
-                      <div
-                        className="flex h-7 w-7 items-center justify-center rounded-full"
-                        style={{ background: activityConfig[item.type].bg, border: `1px solid ${activityConfig[item.type].border}` }}
-                      >
-                        <span
-                          className="h-2 w-2 rounded-full"
-                          style={{ background: activityDotColor[item.type] }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="min-w-0 flex-1 pt-0.5">
-                    <p className="text-[12px] leading-snug text-foreground/80">{item.message}</p>
-                    <p className="mt-1 text-[11px] text-muted-foreground/50">{item.time}</p>
-                  </div>
+                key={item.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 16,
+                  padding: '20px 28px',
+                  borderBottom: idx < recentActivity.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                }}
+              >
+                <Avatar className="h-8 w-8 shrink-0 mt-0.5">
+                  <AvatarFallback
+                    style={{ background: 'rgba(255,255,255,0.06)', color: '#71717a', fontSize: 10, fontWeight: 600 }}
+                  >
+                    {item.avatar ?? '·'}
+                  </AvatarFallback>
+                </Avatar>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, color: '#d4d4d8', lineHeight: 1.5 }}>{item.message}</p>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <span style={{ fontSize: 12, color: '#3f3f46', flexShrink: 0, marginTop: 2 }}>{item.time}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
       </div>
     </div>

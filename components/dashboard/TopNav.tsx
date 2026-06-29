@@ -54,18 +54,12 @@ export default function TopNav() {
           </button>
 
           {/* Separator */}
-          <div className="hidden md:block h-4 w-px bg-border/60" />
+          <div className="hidden md:block h-4 w-px bg-border/50" />
 
-          {/* Breadcrumb */}
-          <div className="hidden md:flex items-center gap-2 text-[13px]">
-            <span className="text-muted-foreground/50">Dashboard</span>
-            {title !== 'Dashboard' && (
-              <>
-                <span className="text-muted-foreground/30">/</span>
-                <span className="font-medium text-foreground/80">{title}</span>
-              </>
-            )}
-          </div>
+          {/* Page title */}
+          <span className="hidden md:block text-[13px] font-medium text-foreground/70">
+            {title}
+          </span>
 
           {/* Mobile page title */}
           <span className="text-[13px] font-semibold text-foreground md:hidden">{title}</span>
