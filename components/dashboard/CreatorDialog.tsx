@@ -5,13 +5,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { Users, X } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,74 +19,71 @@ import { creatorSchema, CREATOR_STATUSES, type CreatorFormValues } from '@/lib/v
 import { PLATFORMS } from '@/lib/validations/campaign'
 import { createCreator, updateCreator, type CreatorWithCount } from '@/app/actions/creators'
 
-// ── Styled native select ───────────────────────────────────────────────────────
-function FieldSelect({
-  id,
-  options,
-  error,
-  ...props
-}: React.SelectHTMLAttributes<HTMLSelectElement> & {
-  id: string
-  options: readonly string[]
-  error?: string
-}) {
+// ── Shared design tokens ──────────────────────────────────────────────────────
+
+const CHEVRON_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`
+
+const fieldInput = (hasError?: boolean): React.CSSProperties => ({
+  height: 44,
+  background: 'rgba(255,255,255,0.04)',
+  border: hasError ? '1px solid #f87171' : '1px solid rgba(255,255,255,0.1)',
+  color: '#e4e4e7',
+  fontSize: 14,
+})
+
+// ── Primitives ────────────────────────────────────────────────────────────────
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <select
-      id={id}
-      style={{
-        width: '100%',
-        height: 36,
-        borderRadius: 8,
-        border: error ? '1px solid #f87171' : '1px solid rgba(255,255,255,0.1)',
-        background: 'rgba(255,255,255,0.04)',
-        color: '#e4e4e7',
-        fontSize: 13,
-        paddingLeft: 10,
-        paddingRight: 10,
-        outline: 'none',
-        cursor: 'pointer',
-        appearance: 'auto',
-      }}
-      {...props}
-    >
-      {options.map((opt) => (
-        <option key={opt} value={opt} style={{ background: '#0f0f13' }}>
-          {opt}
-        </option>
-      ))}
-    </select>
+    <p style={{
+      fontSize: 10, fontWeight: 600, letterSpacing: '0.1em',
+      textTransform: 'uppercase', color: '#3f3f46',
+    }}>
+      {children}
+    </p>
   )
 }
 
 function Field({
-  label,
-  id,
-  error,
-  children,
+  label, id, hint, error, children,
 }: {
-  label: string
-  id: string
-  error?: string
-  children: React.ReactNode
+  label: string; id: string; hint?: string; error?: string; children: React.ReactNode
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <Label htmlFor={id} style={{ fontSize: 12, color: '#a1a1aa', fontWeight: 500 }}>
+      <Label htmlFor={id} style={{ fontSize: 13, color: '#d4d4d8', fontWeight: 500, letterSpacing: '-0.01em' }}>
         {label}
       </Label>
+      {hint && <p style={{ fontSize: 12, color: '#52525b', marginTop: -2, lineHeight: 1.5 }}>{hint}</p>}
       {children}
-      {error && <p style={{ fontSize: 11, color: '#f87171', marginTop: 2 }}>{error}</p>}
+      {error && <p style={{ fontSize: 12, color: '#f87171', marginTop: 2 }}>{error}</p>}
     </div>
   )
 }
 
-const inputStyle = (hasError?: boolean): React.CSSProperties => ({
-  background: 'rgba(255,255,255,0.04)',
-  border: hasError ? '1px solid #f87171' : '1px solid rgba(255,255,255,0.1)',
-  color: '#e4e4e7',
-  fontSize: 13,
-  height: 36,
-})
+function FieldSelect({
+  id, options, error, ...props
+}: React.SelectHTMLAttributes<HTMLSelectElement> & { id: string; options: readonly string[]; error?: string }) {
+  return (
+    <select
+      id={id}
+      style={{
+        width: '100%', height: 44, borderRadius: 8,
+        border: error ? '1px solid #f87171' : '1px solid rgba(255,255,255,0.1)',
+        background: 'rgba(255,255,255,0.04)', color: '#e4e4e7',
+        fontSize: 14, paddingLeft: 12, paddingRight: 36,
+        outline: 'none', cursor: 'pointer', appearance: 'none',
+        backgroundImage: CHEVRON_SVG, backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'right 12px center', colorScheme: 'dark',
+      } as React.CSSProperties}
+      {...props}
+    >
+      {options.map((opt) => (
+        <option key={opt} value={opt} style={{ background: '#0f0f13' }}>{opt}</option>
+      ))}
+    </select>
+  )
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -111,13 +107,8 @@ export function CreatorDialog({ open, onOpenChange, creator }: CreatorDialogProp
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(creatorSchema) as any,
     defaultValues: {
-      name: '',
-      handle: '',
-      platform: 'Instagram',
-      niche: '',
-      status: 'Available',
-      followersCount: 0,
-      engagementRate: 0,
+      name: '', handle: '', platform: 'Instagram', niche: '',
+      status: 'Available', followersCount: 0, engagementRate: 0,
     },
   })
 
@@ -154,67 +145,140 @@ export function CreatorDialog({ open, onOpenChange, creator }: CreatorDialogProp
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-lg"
-        style={{ background: '#0f0f13', border: '1px solid rgba(255,255,255,0.08)', maxWidth: 540 }}
+        className="sm:max-w-[740px] p-0 gap-0 overflow-hidden ring-0"
+        showCloseButton={false}
+        style={{ background: '#0f0f13', border: '1px solid rgba(255,255,255,0.08)' }}
       >
-        <DialogHeader>
-          <DialogTitle style={{ color: '#f4f4f5', fontSize: 16, fontWeight: 600 }}>
-            {isEditing ? 'Edit Creator' : 'Add Creator'}
-          </DialogTitle>
-          <DialogDescription style={{ color: '#52525b', fontSize: 13 }}>
-            {isEditing ? 'Update creator details.' : 'Add a creator to your network.'}
-          </DialogDescription>
-        </DialogHeader>
+
+        {/* ── Header ─────────────────────────────────────────────────────── */}
+        <div style={{ padding: '24px 24px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+              <div style={{
+                height: 38, width: 38, borderRadius: 9, flexShrink: 0,
+                background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Users size={15} style={{ color: '#818cf8' }} />
+              </div>
+              <div style={{ paddingTop: 1 }}>
+                <DialogTitle style={{ color: '#f4f4f5', fontSize: 16, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.25 }}>
+                  {isEditing ? 'Edit Creator' : 'Add Creator'}
+                </DialogTitle>
+                <DialogDescription style={{ color: '#71717a', fontSize: 13, marginTop: 5, lineHeight: 1.5 }}>
+                  {isEditing
+                    ? 'Update the profile and metrics for this creator.'
+                    : 'Add a new creator to your network. All starred fields are required.'}
+                </DialogDescription>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              type="button"
+              onClick={() => onOpenChange(false)}
+              style={{ color: '#52525b', marginTop: -4, marginRight: -6, flexShrink: 0 }}
+            >
+              <X size={15} />
+            </Button>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '8px 0 20px' }}>
-            {/* Name + Handle */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <Field label="Full Name" id="name" error={errors.name?.message}>
-                <Input id="name" placeholder="Sarah Chen" {...register('name')} style={inputStyle(!!errors.name)} />
-              </Field>
-              <Field label="Handle" id="handle" error={errors.handle?.message}>
-                <Input id="handle" placeholder="@sarah.creates" {...register('handle')} style={inputStyle(!!errors.handle)} />
+
+          {/* ── Body ───────────────────────────────────────────────────────── */}
+          <div style={{
+            padding: '24px',
+            display: 'flex', flexDirection: 'column', gap: 24,
+            maxHeight: 'calc(90vh - 200px)', overflowY: 'auto',
+          }}>
+
+            {/* Section: Profile */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <SectionLabel>Profile</SectionLabel>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <Field label="Full Name" id="name" error={errors.name?.message}>
+                  <Input id="name" placeholder="Sarah Chen" {...register('name')} style={fieldInput(!!errors.name)} />
+                </Field>
+                <Field label="Handle" id="handle" hint="Include the @ prefix" error={errors.handle?.message}>
+                  <Input id="handle" placeholder="@sarah.creates" {...register('handle')} style={fieldInput(!!errors.handle)} />
+                </Field>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <Field label="Platform" id="platform" error={errors.platform?.message}>
+                  <FieldSelect id="platform" options={PLATFORMS} error={errors.platform?.message} {...register('platform')} />
+                </Field>
+                <Field label="Status" id="status" error={errors.status?.message}>
+                  <FieldSelect id="status" options={CREATOR_STATUSES} error={errors.status?.message} {...register('status')} />
+                </Field>
+              </div>
+
+              <Field label="Niche" id="niche" hint="Primary content category or industry" error={errors.niche?.message}>
+                <Input id="niche" placeholder="Beauty & Skincare" {...register('niche')} style={fieldInput(!!errors.niche)} />
               </Field>
             </div>
 
-            {/* Platform + Status */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <Field label="Platform" id="platform" error={errors.platform?.message}>
-                <FieldSelect id="platform" options={PLATFORMS} error={errors.platform?.message} {...register('platform')} />
-              </Field>
-              <Field label="Status" id="status" error={errors.status?.message}>
-                <FieldSelect id="status" options={CREATOR_STATUSES} error={errors.status?.message} {...register('status')} />
-              </Field>
-            </div>
+            {/* Divider */}
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.05)' }} />
 
-            {/* Niche */}
-            <Field label="Niche" id="niche" error={errors.niche?.message}>
-              <Input id="niche" placeholder="Beauty & Skincare" {...register('niche')} style={inputStyle(!!errors.niche)} />
-            </Field>
+            {/* Section: Audience Metrics */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <SectionLabel>Audience Metrics</SectionLabel>
 
-            {/* Followers + Engagement */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <Field label="Followers Count" id="followersCount" error={errors.followersCount?.message}>
-                <Input id="followersCount" type="number" min="0" placeholder="284000" {...register('followersCount')} style={inputStyle(!!errors.followersCount)} />
-              </Field>
-              <Field label="Engagement Rate (%)" id="engagementRate" error={errors.engagementRate?.message}>
-                <Input id="engagementRate" type="number" min="0" max="100" step="0.1" placeholder="4.8" {...register('engagementRate')} style={inputStyle(!!errors.engagementRate)} />
-              </Field>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <Field
+                  label="Followers Count"
+                  id="followersCount"
+                  hint="Total followers on the selected platform"
+                  error={errors.followersCount?.message}
+                >
+                  <Input
+                    id="followersCount" type="number" min="0" placeholder="284,000"
+                    {...register('followersCount')} style={fieldInput(!!errors.followersCount)}
+                  />
+                </Field>
+                <Field
+                  label="Engagement Rate (%)"
+                  id="engagementRate"
+                  hint="Avg. (likes + comments) ÷ followers × 100"
+                  error={errors.engagementRate?.message}
+                >
+                  <Input
+                    id="engagementRate" type="number" min="0" max="100" step="0.1" placeholder="4.8"
+                    {...register('engagementRate')} style={fieldInput(!!errors.engagementRate)}
+                  />
+                </Field>
+              </div>
             </div>
           </div>
 
-          <DialogFooter showCloseButton>
+          {/* ── Footer ─────────────────────────────────────────────────────── */}
+          <div style={{
+            padding: '16px 24px',
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            background: 'rgba(255,255,255,0.01)',
+            display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10,
+          }}>
+            <Button
+              variant="ghost"
+              type="button"
+              onClick={() => onOpenChange(false)}
+              style={{ color: '#71717a' }}
+            >
+              Cancel
+            </Button>
             <Button
               type="submit"
               disabled={isPending}
-              style={{ background: '#6366f1', color: '#fff', minWidth: 110 }}
+              style={{ background: '#6366f1', color: '#fff', minWidth: 120 }}
             >
               {isPending
                 ? isEditing ? 'Saving…' : 'Adding…'
                 : isEditing ? 'Save Changes' : 'Add Creator'}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

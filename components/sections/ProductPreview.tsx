@@ -37,7 +37,7 @@ export default function ProductPreview() {
     <section
       style={{
         marginTop: -60,
-        paddingTop: 180,
+        paddingTop: 'clamp(60px, 15vw, 180px)',
         paddingBottom: 60,
         position: 'relative',
         zIndex: 1,

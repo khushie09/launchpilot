@@ -126,18 +126,11 @@ export default function Features() {
           <Corner pos="br" />
 
           <div
-            className="overflow-hidden"
+            className="features-grid overflow-hidden"
             style={{ border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10 }}
           >
-            <div
-              className="grid"
-              style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}
-            >
               {FEATURES.map((feature, i) => {
                 const Icon = feature.icon
-                const col = i % 3
-                const isLastCol = col === 2
-                const isFirstRow = i < 3
 
                 return (
                   <motion.div
@@ -147,8 +140,8 @@ export default function Features() {
                       paddingBottom: 28,
                       paddingLeft: 28,
                       paddingRight: 28,
-                      borderRight: isLastCol ? 'none' : '1px solid rgba(255,255,255,0.05)',
-                      borderBottom: isFirstRow ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                      borderRight: '1px solid rgba(255,255,255,0.05)',
+                      borderBottom: '1px solid rgba(255,255,255,0.05)',
                       transition: 'background 0.18s',
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.012)')}
@@ -185,7 +178,6 @@ export default function Features() {
                   </motion.div>
                 )
               })}
-            </div>
           </div>
         </div>
       </div>

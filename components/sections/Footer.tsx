@@ -47,14 +47,7 @@ export default function Footer() {
         }}
       >
         {/* Top row — brand left, nav right */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            marginBottom: 48,
-          }}
-        >
+        <div className="footer-top">
           {/* Brand */}
           <div>
             <a
@@ -108,7 +101,7 @@ export default function Footer() {
           </div>
 
           {/* Nav links */}
-          <nav style={{ display: 'flex', gap: 28 }}>
+          <nav className="footer-nav">
             {NAV_LINKS.map((link) => (
               <a
                 key={link}
