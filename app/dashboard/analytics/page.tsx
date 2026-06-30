@@ -74,7 +74,7 @@ const card = {
 // ─────────────────────────────────────────────────────────────────────────────
 export default function AnalyticsPage() {
   return (
-    <div style={{ padding: '48px', maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ padding: '32px 48px 48px 112px', maxWidth: 1200, margin: '0 auto' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
 
         {/* Header */}

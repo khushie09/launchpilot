@@ -1,6 +1,6 @@
 'use client'
 
-import { Search, Bell, Menu, ChevronDown } from 'lucide-react'
+import { Search, Bell, Menu } from 'lucide-react'
 import { UserButton, Show } from '@clerk/nextjs'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
@@ -21,48 +21,21 @@ const NAV_ITEMS = Object.entries(NAV_LABELS)
 
 export default function TopNav() {
   const pathname = usePathname()
-  const title = NAV_LABELS[pathname] ?? 'Dashboard'
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
     <>
-      <header className="flex h-[57px] shrink-0 items-center justify-between border-b border-border bg-background px-5 sticky top-0 z-30">
+      <header className="flex h-[57px] shrink-0 items-center justify-between md:justify-end border-b border-border bg-background px-5 sticky top-0 z-30">
 
-        {/* Left — mobile toggle + workspace chip */}
-        <div className="flex items-center gap-3">
+        {/* Left — mobile menu toggle only */}
+        <div className="flex items-center md:hidden">
           <button
-            className="flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground md:hidden"
+            className="flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label="Toggle menu"
           >
             <Menu size={18} strokeWidth={1.8} />
           </button>
-
-          {/* Workspace switcher — desktop only */}
-          <button
-            className="hidden md:flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
-            style={{ fontSize: 13 }}
-          >
-            <div
-              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[10px] font-bold text-white"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
-            >
-              O
-            </div>
-            <span className="font-medium text-foreground/80 whitespace-nowrap">Orbis Creative</span>
-            <ChevronDown size={12} strokeWidth={2} className="text-muted-foreground/50" />
-          </button>
-
-          {/* Separator */}
-          <div className="hidden md:block h-4 w-px bg-border/50" />
-
-          {/* Page title */}
-          <span className="hidden md:block text-[13px] font-medium text-foreground/70">
-            {title}
-          </span>
-
-          {/* Mobile page title */}
-          <span className="text-[13px] font-semibold text-foreground md:hidden">{title}</span>
         </div>
 
         {/* Right — search, bell, avatar */}
@@ -70,12 +43,15 @@ export default function TopNav() {
           {/* Search */}
           <div className="relative hidden sm:block">
             <Search
-              size={13}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 pointer-events-none"
+              size={14}
+              strokeWidth={1.8}
+              className="absolute top-1/2 -translate-y-1/2 text-muted-foreground/50 pointer-events-none"
+              style={{ left: 12 }}
             />
             <Input
               placeholder="Search..."
-              className="h-8 w-52 rounded-full border-border/60 bg-muted/50 pl-8 text-[13px] placeholder:text-muted-foreground/40 focus-visible:ring-1 focus-visible:ring-indigo-500/50 focus-visible:border-indigo-500/30 transition-all"
+              className="h-8 w-52 rounded-full border-border/60 bg-muted/50 text-[13px] placeholder:text-muted-foreground/40 focus-visible:ring-1 focus-visible:ring-indigo-500/50 focus-visible:border-indigo-500/30 transition-all"
+              style={{ paddingLeft: 36, paddingRight: 12 }}
             />
           </div>
 

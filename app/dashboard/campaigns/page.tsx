@@ -1,4 +1,4 @@
-import { Plus, TrendingUp } from 'lucide-react'
+import { TrendingUp } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -43,7 +43,7 @@ const card = {
 // ─────────────────────────────────────────────────────────────────────────────
 export default function CampaignsPage() {
   return (
-    <div style={{ padding: '48px', maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ padding: '32px 48px 48px 112px', maxWidth: 1200, margin: '0 auto' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
 
         {/* Header */}
@@ -65,13 +65,7 @@ export default function CampaignsPage() {
               })}
             </div>
           </div>
-          <Button
-            className="gap-2 text-[13px] font-medium"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none', height: 38 }}
-          >
-            <Plus size={14} strokeWidth={2.5} />
-            New Campaign
-          </Button>
+          <Button className="px-4">New Campaign</Button>
         </div>
 
         {/* Table */}

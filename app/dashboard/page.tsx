@@ -102,7 +102,7 @@ export default function DashboardOverview() {
   const recentCampaigns = campaigns.slice(0, 5)
 
   return (
-    <div style={{ padding: '48px', maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ padding: '32px 48px 48px 112px', maxWidth: 1200, margin: '0 auto' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 56 }}>
 
         {/* ── 1. Header ────────────────────────────────────────────────────── */}
@@ -116,13 +116,7 @@ export default function DashboardOverview() {
             </p>
           </div>
           <Link href="/dashboard/campaigns">
-            <Button
-              className="gap-2 text-[13px] font-medium"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none', height: 38 }}
-            >
-              New Campaign
-              <ArrowRight size={14} strokeWidth={2} />
-            </Button>
+            <Button className="px-4">New Campaign</Button>
           </Link>
         </div>
 
