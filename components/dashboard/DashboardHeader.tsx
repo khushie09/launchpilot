@@ -1,0 +1,53 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { CampaignDialog } from '@/components/dashboard/CampaignDialog'
+
+interface DashboardHeaderProps {
+  activeCampaigns: number
+}
+
+export function DashboardHeader({ activeCampaigns }: DashboardHeaderProps) {
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const router = useRouter()
+
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div>
+          <h1 style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5', lineHeight: 1.1 }}>
+            Overview
+          </h1>
+          <p style={{ marginTop: 8, fontSize: 14, color: '#71717a' }}>
+            {today} · {activeCampaigns} active {activeCampaigns === 1 ? 'campaign' : 'campaigns'}
+          </p>
+        </div>
+        <Button
+          onClick={() => setDialogOpen(true)}
+          className="px-4"
+          style={{ background: '#6366f1', color: '#fff' }}
+        >
+          New Campaign
+        </Button>
+      </div>
+
+      <CampaignDialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open)
+          if (!open) router.refresh()
+        }}
+        campaign={null}
+      />
+    </>
+  )
+}

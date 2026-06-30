@@ -8,13 +8,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 npm run dev      # Start dev server with Turbopack (http://localhost:3000)
-npm run build    # Production build
+npm run build    # Production build (also type-checks — no separate tsc step)
 npm run lint     # ESLint (next core-web-vitals + typescript rules)
 ```
 
-There are no tests. TypeScript type-checking runs through the build: `npm run build` will surface type errors.
+No test suite exists. Type errors surface only via `npm run build`.
 
-After changing components, the dev server hot-reloads automatically. Use Playwright (already installed) to take screenshots and verify visual output:
+After changing components, the dev server hot-reloads automatically. Use Playwright to take screenshots and verify visual output:
 
 ```js
 const { chromium } = require('playwright');
@@ -22,70 +22,66 @@ const browser = await chromium.launch();
 const page = await browser.newPage();
 await page.setViewportSize({ width: 1440, height: 900 });
 await page.goto('http://localhost:3000', { waitUntil: 'networkidle' });
-await page.waitForTimeout(4000); // let framer-motion animations settle
+await page.waitForTimeout(4000);
 await page.screenshot({ path: '/tmp/preview.png' });
 await browser.close();
 ```
 
 ## Stack
 
-- **Next.js 16.2.9** with Turbopack (see AGENTS.md — breaking changes from prior versions)
-- **React 19** / **TypeScript 5** — strict mode enabled
-- **Tailwind CSS v4** — imported via `@import "tailwindcss"` in `globals.css`, configured through `@theme inline` blocks and arbitrary values. No `tailwind.config.js` exists.
-- **Framer Motion 12** — used for all animations (entrance fades, orbit rotation, hover states)
-- **Lucide React 1.21** — icon library used in orbit node pills and CTAs
-- **Geist** fonts loaded via `next/font/google` in `app/layout.tsx`, exposed as CSS vars `--font-geist-sans` / `--font-geist-mono`
+- **Next.js 16.2.9** with Turbopack — see AGENTS.md for breaking changes
+- **React 19** / **TypeScript 5** strict mode
+- **Tailwind CSS v4** — no `tailwind.config.js`; configured via `@theme inline` in `globals.css`. `--spacing: 0.25rem` is set, so all spacing utilities (`p-*`, `m-*`, `gap-*`) work in dashboard components.
+- **shadcn/ui** `base-nova` style — components use `@base-ui/react` primitives (not Radix UI). Add components via `npx shadcn@latest add <name>`. Installed components are in `components/ui/`.
+- **Clerk v7** — auth provider. `currentUser()` / `auth()` for server components; `useUser()` / `useAuth()` for client components. `Show` component for conditional rendering.
+- **Supabase** (`@supabase/supabase-js` + `@supabase/ssr`) — Postgres database. Two client factories in `lib/supabase/`: `client.ts` (browser, `createBrowserClient`) and `server.ts` (Server Components / Route Handlers, `createServerClient` with cookie forwarding). Env vars: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+- **Framer Motion 12** — animations on the marketing pages only
+- **Lucide React 1.21** — icons throughout
 
 ## Path alias
 
-`@/*` maps to the repo root. Use `@/components/...`, `@/app/...` etc.
+`@/*` maps to the repo root. Always use `@/components/...`, `@/lib/...`, etc.
 
 ## Architecture
 
-This is a single-page marketing site. Currently only the Hero section is built.
+LaunchPilot is a **creator campaign management SaaS**. The codebase has two distinct areas:
 
-```
-app/
-  layout.tsx      — root layout, Geist fonts, metadata, antialiasing
-  page.tsx        — renders <Navbar> + <Hero> inside <main>
-  globals.css     — CSS custom properties (#06060F background), Tailwind import,
-                    overflow-x:hidden on body
+### 1. Marketing site (`app/page.tsx`, `components/hero/`, `components/nav/`)
+Landing page with animated hero section. Uses Framer Motion, inline styles, and Tailwind arbitrary values. **Spacing caveat**: spacing utilities worked inconsistently here before `--spacing` was added — use inline styles for anything layout-critical on these pages.
 
-components/
-  nav/
-    Navbar.tsx    — fixed floating glass-pill navbar (pointer-events-none wrapper,
-                    pointer-events-auto on the header itself so viewport sides
-                    remain clickable)
-  hero/
-    Hero.tsx      — section shell; stacks layers: AmbientGlow → Orbit → HeroContent
-                    → ScrollIndicator
-    AmbientGlow.tsx  — three concentric radial-gradient divs that pulse
-    Orbit.tsx     — 800×800 logical canvas (CSS-scaled per breakpoint) containing
-                    one SVG <circle> ring + one rotating <motion.div> that holds
-                    all 8 OrbitNode children
-    OrbitNode.tsx — individual pill: positioned from the ring's centre using
-                    cos/sin, counter-rotated to stay upright, gently floats
-    HeroContent.tsx  — announcement pill, h1, subtext, CTA row; all fade-up on mount
-    ScrollIndicator.tsx — bouncing ChevronDown at viewport bottom
-```
+### 2. Dashboard (`app/dashboard/`, `components/dashboard/`)
+Protected by Clerk in `app/dashboard/layout.tsx` — redirects to `/sign-in` if no user. Layout is a fixed sidebar (`Sidebar.tsx`) + sticky topnav (`TopNav.tsx`) + scrollable `<main>`.
 
-## Orbit coordinate system
+Routes:
+- `/dashboard` — overview with KPI cards, revenue chart, recent campaigns, activity feed
+- `/dashboard/campaigns` — full campaigns table
+- `/dashboard/creators` — creator cards grid
+- `/dashboard/payments` — payments table
+- `/dashboard/analytics` — charts and platform breakdown
+- `/dashboard/settings` — profile/workspace/notification settings (uses `currentUser()` server-side)
 
-`Orbit.tsx` uses an **800×800 logical canvas** centred in the hero section. All positions are in this space — the outer `<div>` applies `scale-[n]` at each Tailwind breakpoint (lg = scale-100) so the SVG ring and JS node positions stay in sync without any JS resize listeners.
+**All dashboard pages use `style={{ padding: '32px 48px 48px 112px', maxWidth: 1200, margin: '0 auto' }}`** as their outer wrapper — keep this consistent.
 
-- Ring centre: (400, 400) in canvas space
-- Node positions: `x = cos(angleDeg°) × radius`, `y = sin(angleDeg°) × radius`
-  — `0°` = right, `90°` = down (standard screen convention)
-- Rotating parent div at `left:400 top:400 width:0 height:0` carries all nodes;
-  each OrbitNode counter-rotates by the same duration to stay label-upright
+### 3. Auth pages (`app/sign-in/`, `app/sign-up/`)
+Clerk `<SignIn>` / `<SignUp>` components with a shared appearance config in `lib/clerkAppearance.ts`.
+
+### Data layer
+`lib/mock-data.ts` — **all data is currently mocked here**. Types (`Campaign`, `Creator`, `Payment`, `Activity`) are defined here alongside static arrays. When replacing with a real backend, replace the exported arrays with fetch calls and keep the types (or derive them from the DB schema).
+
+## Theme
+
+The app is **always dark** — `className="dark"` is hardcoded on `<html>`. There is no light-mode code path. The dark theme tokens live in the `.dark {}` block in `globals.css`. Key values:
+- Background: `#07070a` / `--background`
+- Cards: `#0f0f13` (used inline in dashboard cards, not via CSS var)
+- Primary: `#3b82f6` (blue) — `--primary`
+- Indigo accent (`#6366f1`) is used for sidebar active states and CTA buttons; it is **not** `--primary`
 
 ## Styling conventions
 
-- All colours and spacing are inline styles or Tailwind arbitrary values — no separate theme file
-- `'use client'` is required on every component that uses Framer Motion or browser events
-- Hover colours on plain `<a>` tags use `onMouseEnter`/`onMouseLeave` inline handlers (not Tailwind `hover:`) because the values come from design tokens that aren't in the Tailwind config
-- Gradient text uses `WebkitBackgroundClip: 'text'` + `WebkitTextFillColor: 'transparent'` inline
+Dashboard pages use **inline styles for all card layout** (background, border, borderRadius, padding) because the card token (`--card: #0c0c10`) doesn't match the slightly different value used in practice (`#0f0f13`). Tailwind utilities handle spacing and typography inside components.
+
+Hover states on interactive elements within dashboard cards use `onMouseEnter`/`onMouseLeave` with direct `.style` assignment rather than Tailwind `hover:` — this is intentional for values derived from design tokens not in the Tailwind config.
 
 ## Design references
 
-Inspiration screenshots live in `inspiration/`. Before building or changing any visual section, read the relevant image to understand the target design. The pixel-level source of truth for this project is the inspiration files, not the current implementation.
+Inspiration screenshots live in `inspiration/`. Read the relevant image before building or changing any visual section — it is the pixel-level source of truth.

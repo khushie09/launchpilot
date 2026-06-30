@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Enums ──────────────────────────────────────────────────────────────────────
+
+enum Platform {
+  Instagram
+  TikTok
+  YouTube
+  Twitter
+  LinkedIn
+}
+
+enum CampaignStatus {
+  Draft
+  Active
+  Review
+  Paused
+  Completed
+}
+
+enum PaymentStatus {
+  Pending
+  Processing
+  Paid
+  Failed
+}
+
+enum CreatorStatus {
+  Available
+  Busy
+  Review
+}
+
+// ── Models ─────────────────────────────────────────────────────────────────────
+
+// Mirrors a Clerk user — synced on first sign-in via webhook or on-demand.
+model User {
+  id        String     @id @default(cuid())
+  clerkId   String     @unique
+  email     String     @unique
+  firstName String?
+  lastName  String?
+  imageUrl  String?
+  campaigns Campaign[]
+  payments  Payment[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("users")
+}
+
+model Campaign {
+  id          String         @id @default(cuid())
+  name        String
+  brand       String
+  platform    Platform
+  status      CampaignStatus @default(Draft)
+  budget      Float
+  spent       Float          @default(0)
+  reach       Int            @default(0)
+  engagement  Float          @default(0) // percentage, e.g. 5.3 for 5.3%
+  description String?
+  startDate   DateTime?
+  endDate     DateTime?
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  creatorId String?
+  creator   Creator? @relation(fields: [creatorId], references: [id], onDelete: SetNull)
+
+  payments  Payment[]
+  analytics Analytics[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([creatorId])
+  @@index([status])
+  @@index([platform])
+  @@index([createdAt])
+  @@map("campaigns")
+}
+
+model Creator {
+  id             String        @id @default(cuid())
+  name           String
+  handle         String        @unique
+  platform       Platform
+  niche          String?
+  followersCount Int           @default(0)
+  engagementRate Float         @default(0) // percentage
+  status         CreatorStatus @default(Available)
+  totalEarned    Float         @default(0)
+  avatarUrl      String?
+
+  campaigns Campaign[]
+  payments  Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([platform])
+  @@index([status])
+  @@map("creators")
+}
+
+model Payment {
+  id     String        @id @default(cuid())
+  amount Float
+  status PaymentStatus @default(Pending)
+  method String        @default("Bank Transfer")
+  paidAt DateTime?
+  notes  String?
+
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  creatorId String
+  creator   Creator @relation(fields: [creatorId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campaignId])
+  @@index([creatorId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payments")
+}
+
+// One row per day per campaign — aggregated metrics for analytics charts.
+model Analytics {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date // day granularity
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  conversions Int      @default(0)
+  spend       Float    @default(0)
+  revenue     Float    @default(0)
+  cpm         Float    @default(0) // cost per mille
+  ctr         Float    @default(0) // click-through rate %
+
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([campaignId, date]) // one row per campaign per day
+  @@index([campaignId])
+  @@index([date])
+  @@map("analytics")
+}
