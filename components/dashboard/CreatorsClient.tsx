@@ -310,11 +310,11 @@ export function CreatorsClient({ creators }: CreatorsClientProps) {
   const busy = creators.filter((c) => c.status === 'Busy').length
 
   return (
-    <div style={{ padding: '32px 48px 48px 112px', maxWidth: 1200, margin: '0 auto' }}>
+    <div className="dash-page">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div className="page-header">
           <div>
             <h1 style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5', lineHeight: 1.1 }}>
               Creators
@@ -337,7 +337,7 @@ export function CreatorsClient({ creators }: CreatorsClientProps) {
         {creators.length === 0 ? (
           <EmptyState onAdd={openCreate} />
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+          <div className="creators-grid">
             {creators.map((creator) => (
               <CreatorCard key={creator.id} creator={creator} onEdit={openEdit} />
             ))}

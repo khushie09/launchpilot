@@ -178,11 +178,11 @@ export function PaymentsClient({ payments, formData }: PaymentsClientProps) {
   const processing = optimisticPayments.filter((p) => p.status === 'Processing').reduce((s, p) => s + p.amount, 0)
 
   return (
-    <div style={{ padding: '32px 48px 48px 112px', maxWidth: 1200, margin: '0 auto' }}>
+    <div className="dash-page">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div className="page-header">
           <div>
             <h1 style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5', lineHeight: 1.1 }}>
               Payments

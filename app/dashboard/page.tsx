@@ -180,14 +180,14 @@ export default async function DashboardOverview() {
   ]
 
   return (
-    <div style={{ padding: '32px 48px 48px 112px', maxWidth: 1200, margin: '0 auto' }}>
+    <div className="dash-page">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 56 }}>
 
         {/* ── 1. Header ────────────────────────────────────────────────────── */}
         <DashboardHeader activeCampaigns={activeCampaigns} />
 
         {/* ── 2. KPI cards ─────────────────────────────────────────────────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        <div className="kpi-grid">
           {kpiCards.map((stat) => {
             const Icon = stat.icon
             return (
@@ -216,7 +216,7 @@ export default async function DashboardOverview() {
         {/* ── 3. Revenue chart ─────────────────────────────────────────────── */}
         <div style={card}>
           <div style={{ padding: '28px 32px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+            <div className="revenue-header">
               <div>
                 <p style={{ fontSize: 11, fontWeight: 500, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Revenue

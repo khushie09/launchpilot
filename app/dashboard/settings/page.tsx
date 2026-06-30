@@ -33,7 +33,7 @@ export default async function SettingsPage() {
   ]
 
   return (
-    <div style={{ padding: '32px 48px 48px 112px', maxWidth: 1200, margin: '0 auto' }}>
+    <div className="dash-page">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
 
         {/* Header */}
@@ -58,7 +58,7 @@ export default async function SettingsPage() {
               'Your personal information'
             )}
             <div style={{ padding: '24px 28px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="settings-name-grid">
                 {[
                   { label: 'First Name', value: user?.firstName ?? '', placeholder: 'Your first name' },
                   { label: 'Last Name',  value: user?.lastName ?? '',  placeholder: 'Your last name'  },
@@ -181,7 +181,7 @@ export default async function SettingsPage() {
               'Danger Zone',
               'Irreversible actions — proceed with care'
             )}
-            <div style={{ padding: '24px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+            <div className="settings-action-row" style={{ padding: '24px 28px' }}>
               <div>
                 <p style={{ fontSize: 14, fontWeight: 500, color: '#e4e4e7' }}>Delete Account</p>
                 <p style={{ marginTop: 4, fontSize: 13, color: '#52525b' }}>

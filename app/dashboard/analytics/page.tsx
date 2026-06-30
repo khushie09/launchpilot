@@ -118,7 +118,7 @@ export default async function AnalyticsPage() {
   ]
 
   return (
-    <div style={{ padding: '32px 48px 48px 112px', maxWidth: 1200, margin: '0 auto' }}>
+    <div className="dash-page">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
 
         {/* Header */}
@@ -132,7 +132,7 @@ export default async function AnalyticsPage() {
         </div>
 
         {/* KPI cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        <div className="kpi-grid">
           {topMetrics.map((m) => {
             const Icon = m.icon
             return (
@@ -159,7 +159,7 @@ export default async function AnalyticsPage() {
         </div>
 
         {/* Revenue + Campaigns charts */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 20 }}>
+        <div className="chart-grid-2">
           <div style={card}>
             <div style={{ padding: '24px 28px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <p style={{ fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#52525b' }}>
@@ -190,7 +190,7 @@ export default async function AnalyticsPage() {
         </div>
 
         {/* Platform mix + Top campaigns */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 20 }}>
+        <div className="chart-grid-2">
 
           {/* Platform mix */}
           <div style={card}>

@@ -62,6 +62,7 @@ export default function Hero() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        paddingTop: 56,   /* navbar height — prevents content hiding under fixed header */
       }}
     >
 

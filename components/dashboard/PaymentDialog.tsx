@@ -278,7 +278,7 @@ export function PaymentDialog({ open, onOpenChange, payment, formData }: Payment
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <SectionLabel>Payment Details</SectionLabel>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="dialog-2col">
                 <Field label="Amount (USD)" id="amount" hint="Payment amount in US dollars" error={errors.amount?.message}>
                   <Input
                     id="amount" type="number" min="0" step="0.01" placeholder="2,500"
@@ -291,7 +291,7 @@ export function PaymentDialog({ open, onOpenChange, payment, formData }: Payment
               </div>
 
               {watchedStatus === 'Paid' ? (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div className="dialog-2col">
                   <Field label="Status" id="status" error={errors.status?.message}>
                     <FieldSelect id="status" options={PAYMENT_STATUSES} error={errors.status?.message} {...register('status')} />
                   </Field>

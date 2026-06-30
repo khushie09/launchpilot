@@ -57,7 +57,7 @@ export default function ProductPreview() {
         }}
       />
 
-      <div style={{ maxWidth: 1440, marginLeft: 'auto', marginRight: 'auto', paddingLeft: 24, paddingRight: 24 }}>
+      <div className="landing-px" style={{ maxWidth: 1440, marginLeft: 'auto', marginRight: 'auto' }}>
 
         {/* Section label + headline */}
         <motion.div

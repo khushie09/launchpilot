@@ -40,8 +40,8 @@ export default function Navbar() {
       transition={{ duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
     >
       <div
-        className="flex items-center justify-between"
-        style={{ maxWidth: 1280, marginLeft: 'auto', marginRight: 'auto', paddingLeft: 32, paddingRight: 32, height: 56 }}
+        className="landing-px flex items-center justify-between"
+        style={{ maxWidth: 1280, marginLeft: 'auto', marginRight: 'auto', height: 56 }}
       >
         {/* Brand */}
         <a

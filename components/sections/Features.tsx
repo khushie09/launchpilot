@@ -89,7 +89,7 @@ export default function Features() {
         }}
       />
 
-      <div style={{ maxWidth: 1280, marginLeft: 'auto', marginRight: 'auto', paddingLeft: 32, paddingRight: 32, position: 'relative' }}>
+      <div className="landing-px" style={{ maxWidth: 1280, marginLeft: 'auto', marginRight: 'auto', position: 'relative' }}>
 
         {/* Section header */}
         <div style={{ maxWidth: 480, marginBottom: 56 }}>

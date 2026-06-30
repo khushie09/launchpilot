@@ -204,7 +204,7 @@ export function CampaignDialog({ open, onOpenChange, campaign }: CampaignDialogP
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <SectionLabel>Campaign Details</SectionLabel>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="dialog-2col">
                 <Field label="Campaign Name" id="name" error={errors.name?.message}>
                   <Input id="name" placeholder="Summer Glow 2026" {...register('name')} style={fieldInput(!!errors.name)} />
                 </Field>
@@ -213,7 +213,7 @@ export function CampaignDialog({ open, onOpenChange, campaign }: CampaignDialogP
                 </Field>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="dialog-2col">
                 <Field label="Platform" id="platform" error={errors.platform?.message}>
                   <FieldSelect id="platform" options={PLATFORMS} error={errors.platform?.message} {...register('platform')} />
                 </Field>
@@ -236,7 +236,7 @@ export function CampaignDialog({ open, onOpenChange, campaign }: CampaignDialogP
             {/* Section: Timeline */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <SectionLabel>Timeline</SectionLabel>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="dialog-2col">
                 <Field label="Start Date" id="startDate" error={errors.startDate?.message}>
                   <Input
                     id="startDate" type="date" {...register('startDate')}

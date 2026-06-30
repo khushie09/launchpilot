@@ -37,12 +37,11 @@ export default function Footer() {
       />
 
       <div
+        className="landing-px"
         style={{
           maxWidth: 1280,
           marginLeft: 'auto',
           marginRight: 'auto',
-          paddingLeft: 32,
-          paddingRight: 32,
           position: 'relative',
         }}
       >
@@ -131,13 +130,7 @@ export default function Footer() {
         />
 
         {/* Bottom row — copyright left, socials right */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
+        <div className="footer-bottom">
           <p style={{ color: '#3f3f46', fontSize: 12 }}>
             © 2026 LaunchPilot. All rights reserved.
           </p>

@@ -158,16 +158,16 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
   )
 
   return (
-    <div style={{ padding: '32px 48px 48px 112px', maxWidth: 1200, margin: '0 auto' }}>
+    <div className="dash-page">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div className="page-header">
           <div>
             <h1 style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5', lineHeight: 1.1 }}>
               Campaigns
             </h1>
-            <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div className="status-counts" style={{ marginTop: 10 }}>
               {(['Active', 'Review', 'Draft', 'Completed'] as const).map((s) => {
                 const c = statusConfig[s]
                 const count = statusCounts[s] ?? 0
