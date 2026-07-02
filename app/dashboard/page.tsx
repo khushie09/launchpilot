@@ -191,17 +191,33 @@ export default async function DashboardOverview() {
           {kpiCards.map((stat) => {
             const Icon = stat.icon
             return (
-              <div key={stat.title} style={{ ...card, padding: '28px 28px 24px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
+              <div
+                key={stat.title}
+                className="kpi-card"
+                style={{
+                  ...card,
+                  padding: '24px 26px 22px',
+                  background: 'radial-gradient(ellipse at top left, rgba(99,102,241,0.05) 0%, transparent 55%), #0f0f13',
+                  transition: 'border-color 200ms, box-shadow 200ms',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
                   <p style={{ fontSize: 11, fontWeight: 500, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     {stat.title}
                   </p>
-                  <Icon size={14} strokeWidth={1.8} style={{ color: '#3f3f46', flexShrink: 0 }} />
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Icon size={13} strokeWidth={1.8} style={{ color: stat.iconColor }} />
+                  </div>
                 </div>
-                <p style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-0.035em', color: '#f4f4f5', lineHeight: 1 }}>
+                <p style={{ fontSize: 32, fontWeight: 700, letterSpacing: '-0.035em', color: '#f4f4f5', lineHeight: 1 }}>
                   {stat.value}
                 </p>
-                <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 5 }}>
                   {stat.trend === 'up'
                     ? <TrendingUp size={11} strokeWidth={2} style={{ color: '#4ade80' }} />
                     : <TrendingDown size={11} strokeWidth={2} style={{ color: '#f87171' }} />
@@ -214,8 +230,8 @@ export default async function DashboardOverview() {
         </div>
 
         {/* ── 3. Revenue chart ─────────────────────────────────────────────── */}
-        <div style={card}>
-          <div style={{ padding: '28px 32px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ ...card, boxShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+          <div style={{ padding: '28px 32px 24px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
             <div className="revenue-header">
               <div>
                 <p style={{ fontSize: 11, fontWeight: 500, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
@@ -253,15 +269,20 @@ export default async function DashboardOverview() {
           </div>
 
           {recentCampaigns.length === 0 ? (
-            <div style={{ ...card, padding: '40px 28px', textAlign: 'center' }}>
-              <p style={{ fontSize: 13, color: '#52525b' }}>No campaigns yet.</p>
-              <Link href="/dashboard/campaigns" style={{ fontSize: 13, color: '#818cf8', marginTop: 8, display: 'block' }}>
-                Create your first campaign →
+            <div style={{
+              ...card,
+              padding: '48px 28px', textAlign: 'center',
+              background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.04) 0%, transparent 60%), #0f0f13',
+            }}>
+              <p style={{ fontSize: 14, fontWeight: 500, color: '#71717a' }}>No campaigns yet.</p>
+              <Link href="/dashboard/campaigns" style={{ fontSize: 13, color: '#818cf8', marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 4, textDecoration: 'none' }}>
+                Create your first campaign <ArrowRight size={12} />
               </Link>
             </div>
           ) : (
             <Card style={card}>
               <CardContent className="p-0">
+                <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow style={{ borderColor: 'rgba(255,255,255,0.05)' }} className="hover:bg-transparent">
@@ -280,8 +301,8 @@ export default async function DashboardOverview() {
                       return (
                         <TableRow
                           key={c.id}
-                          style={{ borderColor: 'rgba(255,255,255,0.04)', cursor: 'pointer' }}
-                          className="transition-colors hover:bg-muted/40"
+                          className="table-row-fade transition-colors hover:bg-white/[0.025]"
+                          style={{ borderColor: 'rgba(255,255,255,0.035)', cursor: 'pointer' }}
                         >
                           <TableCell style={{ paddingLeft: 28, paddingTop: 22, paddingBottom: 22 }}>
                             <p style={{ fontSize: 13, fontWeight: 500, color: '#e4e4e7', lineHeight: 1 }}>{c.name}</p>
@@ -314,6 +335,7 @@ export default async function DashboardOverview() {
                     })}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { X } from 'lucide-react'
+import Link from 'next/link'
 
 const NAV_LINKS = ['Product', 'Pricing', 'Docs', 'Changelog']
 
@@ -49,7 +50,7 @@ export default function Footer() {
         <div className="footer-top">
           {/* Brand */}
           <div>
-            <a
+            <Link
               href="/"
               style={{
                 display: 'inline-flex',
@@ -86,7 +87,7 @@ export default function Footer() {
               >
                 LaunchPilot
               </span>
-            </a>
+            </Link>
             <p
               style={{
                 color: '#3f3f46',

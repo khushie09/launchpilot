@@ -3,7 +3,7 @@
 import { useState, useTransition, useOptimistic } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { DollarSign, Pencil, Trash2, CheckCircle2 } from 'lucide-react'
+import { DollarSign, Pencil, Trash2, CheckCircle2, ArrowUpRight } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -69,10 +69,22 @@ function DeleteButton({ id, amount }: { id: string; amount: number }) {
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         width: 28, height: 28, borderRadius: 6,
-        border: confirming ? '1px solid rgba(248,113,113,0.4)' : '1px solid transparent',
-        background: confirming ? 'rgba(248,113,113,0.1)' : 'transparent',
-        color: confirming ? '#f87171' : '#52525b',
+        border: confirming ? '1px solid rgba(248,113,113,0.35)' : '1px solid transparent',
+        background: confirming ? 'rgba(248,113,113,0.08)' : 'transparent',
+        color: confirming ? '#f87171' : '#3f3f46',
         cursor: isPending ? 'not-allowed' : 'pointer', transition: 'all 0.15s',
+      }}
+      onMouseEnter={(e) => {
+        if (!confirming) {
+          e.currentTarget.style.color = '#f87171'
+          e.currentTarget.style.background = 'rgba(248,113,113,0.07)'
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!confirming) {
+          e.currentTarget.style.color = '#3f3f46'
+          e.currentTarget.style.background = 'transparent'
+        }
       }}
     >
       <Trash2 size={13} strokeWidth={1.8} />
@@ -104,17 +116,17 @@ function MarkPaidButton({ id, currentStatus }: { id: string; currentStatus: stri
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         width: 28, height: 28, borderRadius: 6,
         border: '1px solid transparent', background: 'transparent',
-        color: '#52525b', cursor: isPending ? 'not-allowed' : 'pointer',
+        color: '#3f3f46', cursor: isPending ? 'not-allowed' : 'pointer',
         transition: 'all 0.15s',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.border = '1px solid rgba(34,197,94,0.3)'
+        e.currentTarget.style.border = '1px solid rgba(34,197,94,0.25)'
         e.currentTarget.style.color = '#4ade80'
-        e.currentTarget.style.background = 'rgba(34,197,94,0.08)'
+        e.currentTarget.style.background = 'rgba(34,197,94,0.07)'
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.border = '1px solid transparent'
-        e.currentTarget.style.color = '#52525b'
+        e.currentTarget.style.color = '#3f3f46'
         e.currentTarget.style.background = 'transparent'
       }}
     >
@@ -128,20 +140,33 @@ function EmptyState({ onNew }: { onNew: () => void }) {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      justifyContent: 'center', padding: '80px 32px', gap: 16,
+      justifyContent: 'center', padding: '96px 32px', gap: 0,
     }}>
       <div style={{
-        width: 48, height: 48, borderRadius: 12,
-        background: 'rgba(99,102,241,0.1)',
+        width: 56, height: 56, borderRadius: 16, marginBottom: 20,
+        background: 'linear-gradient(135deg, rgba(99,102,241,0.16) 0%, rgba(99,102,241,0.05) 100%)',
+        border: '1px solid rgba(99,102,241,0.2)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: '0 0 0 8px rgba(99,102,241,0.04)',
       }}>
-        <DollarSign size={20} strokeWidth={1.5} style={{ color: '#818cf8' }} />
+        <DollarSign size={22} strokeWidth={1.5} style={{ color: '#818cf8' }} />
       </div>
-      <div style={{ textAlign: 'center' }}>
-        <p style={{ fontSize: 14, fontWeight: 500, color: '#e4e4e7' }}>No payments yet</p>
-        <p style={{ marginTop: 6, fontSize: 13, color: '#52525b' }}>Send your first payment to a creator.</p>
-      </div>
-      <Button onClick={onNew} style={{ background: '#6366f1', color: '#fff', marginTop: 4 }}>
+      <p style={{ fontSize: 15, fontWeight: 600, color: '#e4e4e7', marginBottom: 8, letterSpacing: '-0.01em' }}>
+        No payments yet
+      </p>
+      <p style={{ fontSize: 13, color: '#52525b', marginBottom: 24, textAlign: 'center', maxWidth: 280, lineHeight: 1.6 }}>
+        Send your first payment to a creator. Payments are tracked in real time with instant status updates.
+      </p>
+      <Button
+        onClick={onNew}
+        style={{
+          background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+          color: '#fff',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.25)',
+          gap: 6,
+        }}
+      >
+        <DollarSign size={13} strokeWidth={2} />
         Send Payment
       </Button>
     </div>
@@ -159,8 +184,7 @@ export function PaymentsClient({ payments, formData }: PaymentsClientProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingPayment, setEditingPayment] = useState<PaymentWithRelations | null>(null)
 
-  // Optimistic list — removes deleted items instantly, reflects status changes
-  const [optimisticPayments, updateOptimistic] = useOptimistic(
+  const [optimisticPayments] = useOptimistic(
     payments,
     (state, action: { type: 'delete'; id: string } | { type: 'status'; id: string; status: string }) => {
       if (action.type === 'delete') return state.filter((p) => p.id !== action.id)
@@ -176,6 +200,12 @@ export function PaymentsClient({ payments, formData }: PaymentsClientProps) {
   const paid       = optimisticPayments.filter((p) => p.status === 'Paid').reduce((s, p) => s + p.amount, 0)
   const pending    = optimisticPayments.filter((p) => p.status === 'Pending').reduce((s, p) => s + p.amount, 0)
   const processing = optimisticPayments.filter((p) => p.status === 'Processing').reduce((s, p) => s + p.amount, 0)
+
+  const stats = [
+    { label: 'Paid',       value: fmt(paid),       color: '#4ade80', accent: 'rgba(34,197,94,0.12)',  dot: '#22c55e' },
+    { label: 'Pending',    value: fmt(pending),     color: '#fbbf24', accent: 'rgba(245,158,11,0.12)', dot: '#f59e0b' },
+    { label: 'Processing', value: fmt(processing),  color: '#818cf8', accent: 'rgba(99,102,241,0.12)', dot: '#6366f1' },
+  ]
 
   return (
     <div className="dash-page">
@@ -193,34 +223,66 @@ export function PaymentsClient({ payments, formData }: PaymentsClientProps) {
           </div>
           <Button
             onClick={openCreate}
-            className="gap-2 text-[13px] font-medium"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none', height: 38 }}
+            style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#fff',
+              gap: 6,
+              boxShadow: '0 1px 2px rgba(0,0,0,0.25)',
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.25), 0 0 0 3px rgba(99,102,241,0.25)' }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.25)' }}
           >
-            <DollarSign size={14} strokeWidth={2} />
+            <DollarSign size={13} strokeWidth={2} />
             Send Payment
           </Button>
         </div>
 
         {/* Quick stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-          {[
-            { label: 'Paid',       value: fmt(paid),       color: '#4ade80' },
-            { label: 'Pending',    value: fmt(pending),     color: '#fbbf24' },
-            { label: 'Processing', value: fmt(processing),  color: '#818cf8' },
-          ].map((s) => (
-            <div key={s.label} style={{ ...card, padding: '24px 28px' }}>
-              <p style={{ fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#52525b', marginBottom: 14 }}>
-                {s.label}
-              </p>
-              <p style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.03em', color: s.color, lineHeight: 1 }}>
+        <div className="payments-stats">
+          {stats.map((s) => (
+            <div
+              key={s.label}
+              className="kpi-card"
+              style={{
+                ...card,
+                padding: '22px 24px',
+                background: `radial-gradient(ellipse at top left, ${s.accent} 0%, transparent 60%), #0f0f13`,
+                transition: 'border-color 200ms, box-shadow 200ms',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement
+                el.style.borderColor = 'rgba(255,255,255,0.09)'
+                el.style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)'
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement
+                el.style.borderColor = 'rgba(255,255,255,0.055)'
+                el.style.boxShadow = 'none'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                <p style={{ fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#52525b' }}>
+                  {s.label}
+                </p>
+                <span style={{ height: 7, width: 7, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
+              </div>
+              <p style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', color: s.color, lineHeight: 1 }}>
                 {s.value}
               </p>
+              <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <ArrowUpRight size={11} style={{ color: '#3f3f46' }} />
+                <span style={{ fontSize: 12, color: '#3f3f46' }}>from {optimisticPayments.length} payment{optimisticPayments.length !== 1 ? 's' : ''}</span>
+              </div>
             </div>
           ))}
         </div>
 
         {/* Table */}
-        <Card style={card}>
+        <Card
+          style={card}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)' }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.055)' }}
+        >
           <CardContent className="p-0">
             {optimisticPayments.length === 0 ? (
               <EmptyState onNew={openCreate} />
@@ -228,9 +290,9 @@ export function PaymentsClient({ payments, formData }: PaymentsClientProps) {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow style={{ borderColor: 'rgba(255,255,255,0.05)' }} className="hover:bg-transparent">
+                    <TableRow style={{ borderColor: 'rgba(255,255,255,0.04)' }} className="hover:bg-transparent">
                       {[
-                        { label: 'Creator',  pl: 32 },
+                        { label: 'Creator',  pl: 28 },
                         { label: 'Campaign' },
                         { label: 'Amount' },
                         { label: 'Method' },
@@ -241,7 +303,7 @@ export function PaymentsClient({ payments, formData }: PaymentsClientProps) {
                         <TableHead
                           key={h.label}
                           style={{
-                            paddingLeft: h.pl, paddingTop: 18, paddingBottom: 18,
+                            paddingLeft: h.pl, paddingTop: 14, paddingBottom: 14,
                             fontSize: 11, fontWeight: 500,
                             textTransform: 'uppercase' as const,
                             letterSpacing: '0.07em', color: '#3f3f46',
@@ -261,12 +323,12 @@ export function PaymentsClient({ payments, formData }: PaymentsClientProps) {
                       return (
                         <TableRow
                           key={p.id}
-                          style={{ borderColor: 'rgba(255,255,255,0.04)' }}
-                          className="transition-colors hover:bg-muted/40"
+                          className="table-row-fade transition-colors hover:bg-white/[0.025]"
+                          style={{ borderColor: 'rgba(255,255,255,0.035)' }}
                         >
                           {/* Creator */}
-                          <TableCell style={{ paddingLeft: 32, paddingTop: 22, paddingBottom: 22 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <TableCell style={{ paddingLeft: 28, paddingTop: 18, paddingBottom: 18 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
                               <Avatar className="h-8 w-8">
                                 <AvatarFallback style={{ background: 'rgba(99,102,241,0.12)', color: '#818cf8', fontSize: 11, fontWeight: 600 }}>
                                   {initials(creatorName)}
@@ -277,14 +339,14 @@ export function PaymentsClient({ payments, formData }: PaymentsClientProps) {
                           </TableCell>
 
                           {/* Campaign */}
-                          <TableCell style={{ paddingTop: 22, paddingBottom: 22, maxWidth: 200 }}>
+                          <TableCell style={{ paddingTop: 18, paddingBottom: 18, maxWidth: 200 }}>
                             <p style={{ fontSize: 13, color: '#71717a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {p.campaign.name}
                             </p>
                           </TableCell>
 
                           {/* Amount */}
-                          <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                          <TableCell style={{ paddingTop: 18, paddingBottom: 18 }}>
                             <span style={{
                               fontFamily: 'monospace', fontSize: 14, fontWeight: 600,
                               color: p.status === 'Paid' ? '#4ade80' : p.status === 'Failed' ? '#f87171' : '#f4f4f5',
@@ -294,36 +356,36 @@ export function PaymentsClient({ payments, formData }: PaymentsClientProps) {
                           </TableCell>
 
                           {/* Method */}
-                          <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                          <TableCell style={{ paddingTop: 18, paddingBottom: 18 }}>
                             <span style={{
                               fontSize: 12, color: '#71717a', borderRadius: 6,
-                              padding: '3px 8px', background: 'rgba(255,255,255,0.04)',
-                              border: '1px solid rgba(255,255,255,0.06)',
+                              padding: '3px 8px', background: 'rgba(255,255,255,0.035)',
+                              border: '1px solid rgba(255,255,255,0.05)',
                             }}>
                               {p.method}
                             </span>
                           </TableCell>
 
                           {/* Status */}
-                          <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                          <TableCell style={{ paddingTop: 18, paddingBottom: 18 }}>
                             <span style={{
-                              display: 'inline-flex', alignItems: 'center', gap: 6,
-                              borderRadius: 20, padding: '4px 10px',
+                              display: 'inline-flex', alignItems: 'center', gap: 5,
+                              borderRadius: 20, padding: '3px 9px',
                               fontSize: 11, fontWeight: 500,
                               background: sc.bg, color: sc.text,
                             }}>
-                              <span style={{ height: 6, width: 6, borderRadius: '50%', background: sc.dot, flexShrink: 0 }} />
+                              <span style={{ height: 5, width: 5, borderRadius: '50%', background: sc.dot, flexShrink: 0 }} />
                               {p.status}
                             </span>
                           </TableCell>
 
                           {/* Date */}
-                          <TableCell style={{ paddingTop: 22, paddingBottom: 22, fontFamily: 'monospace', fontSize: 12, color: '#52525b' }}>
+                          <TableCell style={{ paddingTop: 18, paddingBottom: 18, fontFamily: 'monospace', fontSize: 12, color: '#52525b' }}>
                             {fmtDate(displayDate)}
                           </TableCell>
 
                           {/* Actions */}
-                          <TableCell style={{ paddingRight: 24, paddingTop: 22, paddingBottom: 22 }}>
+                          <TableCell style={{ paddingRight: 20, paddingTop: 18, paddingBottom: 18 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                               <MarkPaidButton id={p.id} currentStatus={p.status} />
                               <button
@@ -333,16 +395,16 @@ export function PaymentsClient({ payments, formData }: PaymentsClientProps) {
                                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                                   width: 28, height: 28, borderRadius: 6,
                                   border: '1px solid transparent', background: 'transparent',
-                                  color: '#52525b', cursor: 'pointer', transition: 'all 0.15s',
+                                  color: '#3f3f46', cursor: 'pointer', transition: 'all 0.15s',
                                 }}
                                 onMouseEnter={(e) => {
-                                  e.currentTarget.style.border = '1px solid rgba(255,255,255,0.08)'
+                                  e.currentTarget.style.border = '1px solid rgba(255,255,255,0.07)'
                                   e.currentTarget.style.color = '#a1a1aa'
                                   e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
                                 }}
                                 onMouseLeave={(e) => {
                                   e.currentTarget.style.border = '1px solid transparent'
-                                  e.currentTarget.style.color = '#52525b'
+                                  e.currentTarget.style.color = '#3f3f46'
                                   e.currentTarget.style.background = 'transparent'
                                 }}
                               >
@@ -356,6 +418,18 @@ export function PaymentsClient({ payments, formData }: PaymentsClientProps) {
                     })}
                   </TableBody>
                 </Table>
+                <div style={{
+                  padding: '12px 28px',
+                  borderTop: '1px solid rgba(255,255,255,0.035)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                  <span style={{ fontSize: 12, color: '#3f3f46' }}>
+                    {optimisticPayments.length} payment{optimisticPayments.length !== 1 ? 's' : ''}
+                  </span>
+                  <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#52525b' }}>
+                    Total: <span style={{ color: '#71717a' }}>{fmt(total)}</span>
+                  </span>
+                </div>
               </div>
             )}
           </CardContent>

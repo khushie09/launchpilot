@@ -1,4 +1,5 @@
 import { SignIn } from '@clerk/nextjs'
+import Link from 'next/link'
 import { clerkAppearance } from '@/lib/clerkAppearance'
 
 export default function SignInPage() {
@@ -44,7 +45,7 @@ export default function SignInPage() {
       />
 
       {/* Logo */}
-      <a
+      <Link
         href="/"
         style={{
           display: 'inline-flex',
@@ -81,7 +82,7 @@ export default function SignInPage() {
         >
           LaunchPilot
         </span>
-      </a>
+      </Link>
 
       <SignIn appearance={clerkAppearance} />
     </div>

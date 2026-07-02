@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Pencil, Trash2, TrendingUp, Megaphone } from 'lucide-react'
+import { Pencil, Trash2, TrendingUp, Megaphone, ArrowRight } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -71,18 +71,25 @@ function DeleteButton({ id, name }: { id: string; name: string }) {
       disabled={isPending}
       title={confirming ? 'Click again to confirm' : 'Delete campaign'}
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 28,
-        height: 28,
-        borderRadius: 6,
-        border: confirming ? '1px solid rgba(248,113,113,0.4)' : '1px solid transparent',
-        background: confirming ? 'rgba(248,113,113,0.1)' : 'transparent',
-        color: confirming ? '#f87171' : '#52525b',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: 28, height: 28, borderRadius: 6,
+        border: confirming ? '1px solid rgba(248,113,113,0.35)' : '1px solid transparent',
+        background: confirming ? 'rgba(248,113,113,0.08)' : 'transparent',
+        color: confirming ? '#f87171' : '#3f3f46',
         cursor: isPending ? 'not-allowed' : 'pointer',
-        transition: 'all 0.15s',
-        flexShrink: 0,
+        transition: 'all 0.15s', flexShrink: 0,
+      }}
+      onMouseEnter={(e) => {
+        if (!confirming) {
+          e.currentTarget.style.color = '#f87171'
+          e.currentTarget.style.background = 'rgba(248,113,113,0.07)'
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!confirming) {
+          e.currentTarget.style.color = '#3f3f46'
+          e.currentTarget.style.background = 'transparent'
+        }
       }}
     >
       <Trash2 size={13} strokeWidth={1.8} />
@@ -90,42 +97,38 @@ function DeleteButton({ id, name }: { id: string; name: string }) {
   )
 }
 
-// ── Empty state ────────────────────────────────────────────────────────────────
+// ── Empty state ───────────────────────────────────────────────────────────────
 function EmptyState({ onNew }: { onNew: () => void }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '80px 32px',
-        gap: 16,
-      }}
-    >
-      <div
-        style={{
-          width: 48,
-          height: 48,
-          borderRadius: 12,
-          background: 'rgba(99,102,241,0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Megaphone size={20} strokeWidth={1.5} style={{ color: '#818cf8' }} />
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      justifyContent: 'center', padding: '96px 32px', gap: 0,
+    }}>
+      <div style={{
+        width: 56, height: 56, borderRadius: 16, marginBottom: 20,
+        background: 'linear-gradient(135deg, rgba(99,102,241,0.16) 0%, rgba(99,102,241,0.05) 100%)',
+        border: '1px solid rgba(99,102,241,0.2)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: '0 0 0 8px rgba(99,102,241,0.04)',
+      }}>
+        <Megaphone size={22} strokeWidth={1.5} style={{ color: '#818cf8' }} />
       </div>
-      <div style={{ textAlign: 'center' }}>
-        <p style={{ fontSize: 14, fontWeight: 500, color: '#e4e4e7' }}>No campaigns yet</p>
-        <p style={{ marginTop: 6, fontSize: 13, color: '#52525b' }}>
-          Create your first campaign to get started.
-        </p>
-      </div>
+      <p style={{ fontSize: 15, fontWeight: 600, color: '#e4e4e7', marginBottom: 8, letterSpacing: '-0.01em' }}>
+        No campaigns yet
+      </p>
+      <p style={{ fontSize: 13, color: '#52525b', marginBottom: 24, textAlign: 'center', maxWidth: 280, lineHeight: 1.6 }}>
+        Create your first campaign to start managing creator collaborations and tracking performance.
+      </p>
       <Button
         onClick={onNew}
-        style={{ background: '#6366f1', color: '#fff', marginTop: 4 }}
+        style={{
+          background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+          color: '#fff',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.25)',
+          gap: 6,
+        }}
       >
+        <Megaphone size={13} strokeWidth={2} />
         New Campaign
       </Button>
     </div>
@@ -182,15 +185,26 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
           </div>
           <Button
             onClick={openCreate}
-            className="px-4"
-            style={{ background: '#6366f1', color: '#fff' }}
+            style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#fff',
+              gap: 6,
+              boxShadow: '0 1px 2px rgba(0,0,0,0.25)',
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.25), 0 0 0 3px rgba(99,102,241,0.25)' }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.25)' }}
           >
+            <Megaphone size={13} strokeWidth={2} />
             New Campaign
           </Button>
         </div>
 
         {/* Table */}
-        <Card style={card}>
+        <Card
+          style={card}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)' }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.055)' }}
+        >
           <CardContent className="p-0">
             {campaigns.length === 0 ? (
               <EmptyState onNew={openCreate} />
@@ -198,9 +212,9 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow style={{ borderColor: 'rgba(255,255,255,0.05)' }} className="hover:bg-transparent">
+                    <TableRow style={{ borderColor: 'rgba(255,255,255,0.04)' }} className="hover:bg-transparent">
                       {[
-                        { label: 'Campaign', pl: 32 },
+                        { label: 'Campaign', pl: 28 },
                         { label: 'Creator' },
                         { label: 'Platform' },
                         { label: 'Status' },
@@ -213,8 +227,8 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
                           key={h.label}
                           style={{
                             paddingLeft: h.pl,
-                            paddingTop: 18,
-                            paddingBottom: 18,
+                            paddingTop: 14,
+                            paddingBottom: 14,
                             fontSize: 11,
                             fontWeight: 500,
                             textTransform: 'uppercase' as const,
@@ -240,16 +254,16 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
                       return (
                         <TableRow
                           key={c.id}
-                          style={{ borderColor: 'rgba(255,255,255,0.04)' }}
-                          className="transition-colors hover:bg-muted/40"
+                          className="table-row-fade transition-colors hover:bg-white/[0.025]"
+                          style={{ borderColor: 'rgba(255,255,255,0.035)' }}
                         >
-                          <TableCell style={{ paddingLeft: 32, paddingTop: 22, paddingBottom: 22 }}>
+                          <TableCell style={{ paddingLeft: 28, paddingTop: 18, paddingBottom: 18 }}>
                             <p style={{ fontSize: 13, fontWeight: 500, color: '#e4e4e7', lineHeight: 1 }}>{c.name}</p>
-                            <p style={{ marginTop: 5, fontSize: 12, color: '#52525b' }}>{c.brand}</p>
+                            <p style={{ marginTop: 4, fontSize: 12, color: '#52525b' }}>{c.brand}</p>
                           </TableCell>
-                          <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                          <TableCell style={{ paddingTop: 18, paddingBottom: 18 }}>
                             {creatorName ? (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
                                 <Avatar className="h-7 w-7">
                                   <AvatarFallback
                                     style={{ background: 'rgba(99,102,241,0.12)', color: '#818cf8', fontSize: 10, fontWeight: 600 }}
@@ -263,67 +277,52 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
                               <span style={{ fontSize: 12, color: '#3f3f46' }}>—</span>
                             )}
                           </TableCell>
-                          <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                borderRadius: 20,
-                                padding: '4px 10px',
-                                fontSize: 11,
-                                fontWeight: 500,
-                                background: pc.bg,
-                                color: pc.text,
-                              }}
-                            >
+                          <TableCell style={{ paddingTop: 18, paddingBottom: 18 }}>
+                            <span style={{
+                              display: 'inline-flex', alignItems: 'center',
+                              borderRadius: 20, padding: '3px 9px',
+                              fontSize: 11, fontWeight: 500,
+                              background: pc.bg, color: pc.text,
+                            }}>
                               {c.platform}
                             </span>
                           </TableCell>
-                          <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 6,
-                                borderRadius: 20,
-                                padding: '4px 10px',
-                                fontSize: 11,
-                                fontWeight: 500,
-                                background: sc.bg,
-                                color: sc.text,
-                              }}
-                            >
-                              <span style={{ height: 6, width: 6, borderRadius: '50%', background: sc.dot, flexShrink: 0 }} />
+                          <TableCell style={{ paddingTop: 18, paddingBottom: 18 }}>
+                            <span style={{
+                              display: 'inline-flex', alignItems: 'center', gap: 5,
+                              borderRadius: 20, padding: '3px 9px',
+                              fontSize: 11, fontWeight: 500,
+                              background: sc.bg, color: sc.text,
+                            }}>
+                              <span style={{ height: 5, width: 5, borderRadius: '50%', background: sc.dot, flexShrink: 0 }} />
                               {c.status}
                             </span>
                           </TableCell>
-                          <TableCell style={{ paddingTop: 22, paddingBottom: 22, fontFamily: 'monospace', fontSize: 13, color: '#a1a1aa' }}>
+                          <TableCell style={{ paddingTop: 18, paddingBottom: 18, fontFamily: 'monospace', fontSize: 13, color: '#a1a1aa' }}>
                             ${c.budget.toLocaleString()}
                           </TableCell>
-                          <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                          <TableCell style={{ paddingTop: 18, paddingBottom: 18 }}>
                             {c.spent > 0 ? (
                               <div>
                                 <span style={{ fontFamily: 'monospace', fontSize: 13, color: '#a1a1aa' }}>
                                   ${c.spent.toLocaleString()}
                                 </span>
-                                <div style={{ marginTop: 6, height: 3, width: 80, borderRadius: 2, background: 'rgba(255,255,255,0.07)', overflow: 'hidden' }}>
-                                  <div
-                                    style={{
-                                      height: '100%',
-                                      borderRadius: 2,
-                                      width: `${Math.min(spendPct, 100)}%`,
-                                      background: spendPct > 90 ? '#f87171' : spendPct > 70 ? '#fbbf24' : '#818cf8',
-                                    }}
-                                  />
+                                <div style={{ marginTop: 5, height: 3, width: 72, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                                  <div style={{
+                                    height: '100%', borderRadius: 2,
+                                    width: `${Math.min(spendPct, 100)}%`,
+                                    background: spendPct > 90 ? '#f87171' : spendPct > 70 ? '#fbbf24' : '#818cf8',
+                                    transition: 'width 600ms ease',
+                                  }} />
                                 </div>
                               </div>
                             ) : (
                               <span style={{ fontSize: 12, color: '#3f3f46' }}>—</span>
                             )}
                           </TableCell>
-                          <TableCell style={{ paddingTop: 22, paddingBottom: 22 }}>
+                          <TableCell style={{ paddingTop: 18, paddingBottom: 18 }}>
                             {c.reach > 0 ? (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                                 <span style={{ fontFamily: 'monospace', fontSize: 13, color: '#a1a1aa' }}>
                                   {c.reach >= 1000 ? `${(c.reach / 1000).toFixed(0)}K` : c.reach}
                                 </span>
@@ -338,33 +337,25 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
                               <span style={{ fontSize: 12, color: '#3f3f46' }}>—</span>
                             )}
                           </TableCell>
-                          <TableCell style={{ paddingRight: 24, paddingTop: 22, paddingBottom: 22 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <TableCell style={{ paddingRight: 20, paddingTop: 18, paddingBottom: 18 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                               <button
                                 onClick={() => openEdit(c)}
                                 title="Edit campaign"
                                 style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  width: 28,
-                                  height: 28,
-                                  borderRadius: 6,
-                                  border: '1px solid transparent',
-                                  background: 'transparent',
-                                  color: '#52525b',
-                                  cursor: 'pointer',
-                                  transition: 'all 0.15s',
-                                  flexShrink: 0,
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  width: 28, height: 28, borderRadius: 6,
+                                  border: '1px solid transparent', background: 'transparent',
+                                  color: '#3f3f46', cursor: 'pointer', transition: 'all 0.15s', flexShrink: 0,
                                 }}
                                 onMouseEnter={(e) => {
-                                  e.currentTarget.style.border = '1px solid rgba(255,255,255,0.08)'
+                                  e.currentTarget.style.border = '1px solid rgba(255,255,255,0.07)'
                                   e.currentTarget.style.color = '#a1a1aa'
                                   e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
                                 }}
                                 onMouseLeave={(e) => {
                                   e.currentTarget.style.border = '1px solid transparent'
-                                  e.currentTarget.style.color = '#52525b'
+                                  e.currentTarget.style.color = '#3f3f46'
                                   e.currentTarget.style.background = 'transparent'
                                 }}
                               >
@@ -378,6 +369,23 @@ export function CampaignsClient({ campaigns }: CampaignsClientProps) {
                     })}
                   </TableBody>
                 </Table>
+                {campaigns.length > 0 && (
+                  <div style={{
+                    padding: '12px 28px',
+                    borderTop: '1px solid rgba(255,255,255,0.035)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  }}>
+                    <span style={{ fontSize: 12, color: '#3f3f46' }}>
+                      {campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}
+                    </span>
+                    <span style={{ fontSize: 12, color: '#52525b', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      Total budget: <span style={{ fontFamily: 'monospace', color: '#71717a', marginLeft: 4 }}>
+                        ${campaigns.reduce((s, c) => s + c.budget, 0).toLocaleString()}
+                      </span>
+                      <ArrowRight size={11} style={{ color: '#3f3f46' }} />
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>

@@ -19,19 +19,25 @@ import { creatorSchema, CREATOR_STATUSES, type CreatorFormValues } from '@/lib/v
 import { PLATFORMS } from '@/lib/validations/campaign'
 import { createCreator, updateCreator, type CreatorWithCount } from '@/app/actions/creators'
 
-// ── Shared design tokens ──────────────────────────────────────────────────────
+// ── Design tokens ─────────────────────────────────────────────────────────────
 
 const CHEVRON_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`
 
 const fieldInput = (hasError?: boolean): React.CSSProperties => ({
-  height: 44,
+  height: 40,
   background: 'rgba(255,255,255,0.04)',
-  border: hasError ? '1px solid #f87171' : '1px solid rgba(255,255,255,0.1)',
+  border: hasError ? '1px solid #f87171' : '1px solid rgba(255,255,255,0.09)',
+  borderRadius: 8,
   color: '#e4e4e7',
   fontSize: 14,
+  transition: 'border-color 150ms, box-shadow 150ms',
 })
 
 // ── Primitives ────────────────────────────────────────────────────────────────
+
+function Spinner() {
+  return <span className="btn-spinner" aria-hidden="true" />
+}
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -68,14 +74,23 @@ function FieldSelect({
     <select
       id={id}
       style={{
-        width: '100%', height: 44, borderRadius: 8,
-        border: error ? '1px solid #f87171' : '1px solid rgba(255,255,255,0.1)',
+        width: '100%', height: 40, borderRadius: 8,
+        border: error ? '1px solid #f87171' : '1px solid rgba(255,255,255,0.09)',
         background: 'rgba(255,255,255,0.04)', color: '#e4e4e7',
         fontSize: 14, paddingLeft: 12, paddingRight: 36,
         outline: 'none', cursor: 'pointer', appearance: 'none',
         backgroundImage: CHEVRON_SVG, backgroundRepeat: 'no-repeat',
         backgroundPosition: 'right 12px center', colorScheme: 'dark',
+        transition: 'border-color 150ms, box-shadow 150ms',
       } as React.CSSProperties}
+      onFocus={(e) => {
+        e.currentTarget.style.borderColor = 'rgba(99,102,241,0.5)'
+        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.12)'
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.borderColor = error ? '#f87171' : 'rgba(255,255,255,0.09)'
+        e.currentTarget.style.boxShadow = 'none'
+      }}
       {...props}
     >
       {options.map((opt) => (
@@ -145,27 +160,33 @@ export function CreatorDialog({ open, onOpenChange, creator }: CreatorDialogProp
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-[740px] p-0 gap-0 overflow-hidden ring-0"
+        className="sm:max-w-[620px] p-0 gap-0 overflow-hidden ring-0"
         showCloseButton={false}
-        style={{ background: '#0f0f13', border: '1px solid rgba(255,255,255,0.08)' }}
+        style={{
+          background: '#0d0d11',
+          border: '1px solid rgba(255,255,255,0.07)',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04) inset',
+        }}
       >
 
         {/* ── Header ─────────────────────────────────────────────────────── */}
-        <div style={{ padding: '24px 24px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ padding: '22px 24px 18px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
               <div style={{
-                height: 38, width: 38, borderRadius: 9, flexShrink: 0,
-                background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)',
+                height: 38, width: 38, borderRadius: 10, flexShrink: 0,
+                background: 'linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(99,102,241,0.06) 100%)',
+                border: '1px solid rgba(99,102,241,0.22)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 0 0 4px rgba(99,102,241,0.06)',
               }}>
                 <Users size={15} style={{ color: '#818cf8' }} />
               </div>
               <div style={{ paddingTop: 1 }}>
-                <DialogTitle style={{ color: '#f4f4f5', fontSize: 16, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.25 }}>
+                <DialogTitle style={{ color: '#f4f4f5', fontSize: 15, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.25 }}>
                   {isEditing ? 'Edit Creator' : 'Add Creator'}
                 </DialogTitle>
-                <DialogDescription style={{ color: '#71717a', fontSize: 13, marginTop: 5, lineHeight: 1.5 }}>
+                <DialogDescription style={{ color: '#71717a', fontSize: 13, marginTop: 4, lineHeight: 1.5 }}>
                   {isEditing
                     ? 'Update the profile and metrics for this creator.'
                     : 'Add a new creator to your network. All starred fields are required.'}
@@ -177,7 +198,9 @@ export function CreatorDialog({ open, onOpenChange, creator }: CreatorDialogProp
               size="icon-sm"
               type="button"
               onClick={() => onOpenChange(false)}
-              style={{ color: '#52525b', marginTop: -4, marginRight: -6, flexShrink: 0 }}
+              style={{ color: '#3f3f46', marginTop: -4, marginRight: -6, flexShrink: 0 }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#a1a1aa' }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#3f3f46' }}
             >
               <X size={15} />
             </Button>
@@ -187,14 +210,16 @@ export function CreatorDialog({ open, onOpenChange, creator }: CreatorDialogProp
         <form onSubmit={handleSubmit(onSubmit)}>
 
           {/* ── Body ───────────────────────────────────────────────────────── */}
-          <div style={{
-            padding: '24px',
-            display: 'flex', flexDirection: 'column', gap: 24,
-            maxHeight: 'calc(90vh - 200px)', overflowY: 'auto',
-          }}>
+          <div
+            className="dialog-body"
+            style={{
+              display: 'flex', flexDirection: 'column', gap: 22,
+              maxHeight: 'calc(min(90vh, 680px) - 200px)', overflowY: 'auto',
+            }}
+          >
 
-            {/* Section: Profile */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Profile */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <SectionLabel>Profile</SectionLabel>
 
               <div className="dialog-2col">
@@ -220,11 +245,10 @@ export function CreatorDialog({ open, onOpenChange, creator }: CreatorDialogProp
               </Field>
             </div>
 
-            {/* Divider */}
-            <div style={{ height: 1, background: 'rgba(255,255,255,0.05)' }} />
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.04)' }} />
 
-            {/* Section: Audience Metrics */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Audience Metrics */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <SectionLabel>Audience Metrics</SectionLabel>
 
               <div className="dialog-2col">
@@ -255,25 +279,38 @@ export function CreatorDialog({ open, onOpenChange, creator }: CreatorDialogProp
           </div>
 
           {/* ── Footer ─────────────────────────────────────────────────────── */}
-          <div style={{
-            padding: '16px 24px',
-            borderTop: '1px solid rgba(255,255,255,0.06)',
-            background: 'rgba(255,255,255,0.01)',
-            display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10,
-          }}>
+          <div className="dialog-footer">
             <Button
               variant="ghost"
               type="button"
               onClick={() => onOpenChange(false)}
-              style={{ color: '#71717a' }}
+              style={{ color: '#71717a', fontSize: 14 }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#a1a1aa' }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#71717a' }}
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isPending}
-              style={{ background: '#6366f1', color: '#fff', minWidth: 120 }}
+              style={{
+                background: isPending
+                  ? 'rgba(99,102,241,0.7)'
+                  : 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                color: '#fff',
+                minWidth: 120,
+                gap: 7,
+                boxShadow: isPending ? 'none' : '0 1px 2px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.08) inset',
+                transition: 'opacity 150ms, box-shadow 150ms',
+              }}
+              onMouseEnter={(e) => {
+                if (!isPending) (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.25), 0 0 0 3px rgba(99,102,241,0.3)'
+              }}
+              onMouseLeave={(e) => {
+                if (!isPending) (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.08) inset'
+              }}
             >
+              {isPending && <Spinner />}
               {isPending
                 ? isEditing ? 'Saving…' : 'Adding…'
                 : isEditing ? 'Save Changes' : 'Add Creator'}

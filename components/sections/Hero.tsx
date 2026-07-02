@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import {
   ArrowRight,
   User, Diamond, Rocket, FileCheck,
@@ -321,7 +322,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65, delay: 0.26, ease }}
         >
-          <a
+          <Link
             href="/sign-in"
             className="inline-flex items-center font-medium text-white"
             style={{
@@ -342,7 +343,7 @@ export default function Hero() {
           >
             Get Started
             <ArrowRight size={13} strokeWidth={2.5} />
-          </a>
+          </Link>
 
           <a
             href="#"

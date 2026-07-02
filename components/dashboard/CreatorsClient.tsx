@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { motion } from 'framer-motion'
 import { UserPlus, ExternalLink, MessageSquare, Pencil, Trash2, Users } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -17,12 +18,7 @@ function formatFollowers(n: number): string {
 }
 
 function initials(name: string): string {
-  return name
-    .split(' ')
-    .map((w) => w[0] ?? '')
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
+  return name.split(' ').map((w) => w[0] ?? '').join('').slice(0, 2).toUpperCase()
 }
 
 // ── Config ────────────────────────────────────────────────────────────────────
@@ -83,11 +79,23 @@ function DeleteButton({ id, name }: { id: string; name: string }) {
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         width: 26, height: 26, borderRadius: 6,
-        border: confirming ? '1px solid rgba(248,113,113,0.4)' : '1px solid transparent',
-        background: confirming ? 'rgba(248,113,113,0.1)' : 'transparent',
-        color: confirming ? '#f87171' : '#52525b',
+        border: confirming ? '1px solid rgba(248,113,113,0.35)' : '1px solid transparent',
+        background: confirming ? 'rgba(248,113,113,0.08)' : 'transparent',
+        color: confirming ? '#f87171' : '#3f3f46',
         cursor: isPending ? 'not-allowed' : 'pointer',
         transition: 'all 0.15s', flexShrink: 0,
+      }}
+      onMouseEnter={(e) => {
+        if (!confirming) {
+          e.currentTarget.style.color = '#f87171'
+          e.currentTarget.style.background = 'rgba(248,113,113,0.07)'
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!confirming) {
+          e.currentTarget.style.color = '#3f3f46'
+          e.currentTarget.style.background = 'transparent'
+        }
       }}
     >
       <Trash2 size={12} strokeWidth={1.8} />
@@ -110,43 +118,52 @@ function CreatorCard({
 
   return (
     <Card
-      style={{ ...card, cursor: 'default', transition: 'border-color 180ms' }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)' }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.055)' }}
+      style={{
+        ...card,
+        cursor: 'default',
+        transition: 'border-color 200ms, box-shadow 200ms, transform 200ms',
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLElement
+        el.style.borderColor = 'rgba(255,255,255,0.1)'
+        el.style.boxShadow = '0 8px 32px rgba(0,0,0,0.5)'
+        el.style.transform = 'translateY(-1px)'
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLElement
+        el.style.borderColor = 'rgba(255,255,255,0.055)'
+        el.style.boxShadow = 'none'
+        el.style.transform = 'translateY(0)'
+      }}
     >
-      <CardContent style={{ padding: '28px' }}>
+      <CardContent style={{ padding: '26px' }}>
         {/* Avatar + status + actions */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
           <div style={{ position: 'relative' }}>
-            <div
-              style={{
-                height: 52, width: 52, borderRadius: 14,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 16, fontWeight: 700, color: 'white', background: gradient,
-              }}
-            >
+            <div style={{
+              height: 50, width: 50, borderRadius: 13,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 15, fontWeight: 700, color: 'white', background: gradient,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            }}>
               {initials(creator.name)}
             </div>
-            <div
-              style={{
-                position: 'absolute', bottom: -4, right: -4,
-                height: 18, width: 18, borderRadius: '50%',
-                background: '#0f0f13', border: '1px solid rgba(255,255,255,0.08)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >
+            <div style={{
+              position: 'absolute', bottom: -4, right: -4,
+              height: 18, width: 18, borderRadius: '50%',
+              background: '#0f0f13', border: '1px solid rgba(255,255,255,0.08)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
               <span style={{ height: 8, width: 8, borderRadius: '50%', background: platformColor }} />
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span
-              style={{
-                display: 'inline-flex', alignItems: 'center', borderRadius: 20,
-                padding: '3px 9px', fontSize: 11, fontWeight: 500,
-                background: sc.bg, color: sc.text,
-              }}
-            >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', borderRadius: 20,
+              padding: '3px 9px', fontSize: 11, fontWeight: 500,
+              background: sc.bg, color: sc.text,
+            }}>
               {creator.status}
             </span>
             <button
@@ -156,16 +173,16 @@ function CreatorCard({
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 width: 26, height: 26, borderRadius: 6,
                 border: '1px solid transparent', background: 'transparent',
-                color: '#52525b', cursor: 'pointer', transition: 'all 0.15s',
+                color: '#3f3f46', cursor: 'pointer', transition: 'all 0.15s',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.border = '1px solid rgba(255,255,255,0.08)'
+                e.currentTarget.style.border = '1px solid rgba(255,255,255,0.07)'
                 e.currentTarget.style.color = '#a1a1aa'
                 e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.border = '1px solid transparent'
-                e.currentTarget.style.color = '#52525b'
+                e.currentTarget.style.color = '#3f3f46'
                 e.currentTarget.style.background = 'transparent'
               }}
             >
@@ -180,14 +197,12 @@ function CreatorCard({
         <p style={{ marginTop: 3, fontSize: 12, color: '#52525b' }}>{creator.handle}</p>
 
         {/* Platform + niche */}
-        <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span
-            style={{
-              display: 'inline-flex', alignItems: 'center', borderRadius: 6,
-              padding: '2px 8px', fontSize: 11, fontWeight: 500,
-              background: `${platformColor}14`, color: platformColor,
-            }}
-          >
+        <div style={{ marginTop: 11, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', borderRadius: 6,
+            padding: '2px 8px', fontSize: 11, fontWeight: 500,
+            background: `${platformColor}14`, color: platformColor,
+          }}>
             {creator.platform}
           </span>
           {creator.niche && (
@@ -199,21 +214,19 @@ function CreatorCard({
         </div>
 
         {/* Stats grid */}
-        <div
-          style={{
-            marginTop: 20, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-            borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)',
-          }}
-        >
+        <div style={{
+          marginTop: 18, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+          borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)',
+        }}>
           {[
-            { label: 'Followers',  value: formatFollowers(creator.followersCount) },
-            { label: 'Engagement', value: creator.engagementRate > 0 ? `${creator.engagementRate.toFixed(1)}%` : '—' },
-            { label: 'Campaigns',  value: String(campaignCount) },
+            { label: 'Followers',   value: formatFollowers(creator.followersCount) },
+            { label: 'Engagement',  value: creator.engagementRate > 0 ? `${creator.engagementRate.toFixed(1)}%` : '—' },
+            { label: 'Campaigns',   value: String(campaignCount) },
           ].map((s, i) => (
             <div
               key={s.label}
               style={{
-                padding: '12px 14px',
+                padding: '11px 12px',
                 borderRight: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none',
                 background: 'rgba(255,255,255,0.015)',
               }}
@@ -225,24 +238,33 @@ function CreatorCard({
         </div>
 
         {/* Earned */}
-        <p style={{ marginTop: 14, fontSize: 12, color: '#52525b' }}>
-          Earned:{' '}
-          <span style={{ color: '#a1a1aa', fontWeight: 500 }}>
+        <p style={{ marginTop: 13, fontSize: 12, color: '#52525b' }}>
+          Total earned:{' '}
+          <span style={{ color: creator.totalEarned > 0 ? '#a1a1aa' : '#3f3f46', fontWeight: 500 }}>
             {creator.totalEarned > 0 ? `$${creator.totalEarned.toLocaleString()}` : '—'}
           </span>
         </p>
 
         {/* CTAs */}
-        <div style={{ marginTop: 20, display: 'flex', gap: 8 }}>
+        <div style={{ marginTop: 18, display: 'flex', gap: 8 }}>
           <button
             style={{
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              gap: 6, borderRadius: 8, padding: '9px 0', fontSize: 12, fontWeight: 500,
+              gap: 6, borderRadius: 8, padding: '8px 0', fontSize: 12, fontWeight: 500,
               color: '#71717a', border: '1px solid rgba(255,255,255,0.07)',
-              background: 'transparent', cursor: 'pointer', transition: 'background 140ms, color 140ms',
+              background: 'transparent', cursor: 'pointer',
+              transition: 'background 140ms, color 140ms, border-color 140ms',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.color = '#f4f4f5' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#71717a' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
+              e.currentTarget.style.color = '#e4e4e7'
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.color = '#71717a'
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'
+            }}
           >
             <MessageSquare size={12} strokeWidth={1.8} />
             Message
@@ -250,12 +272,19 @@ function CreatorCard({
           <button
             style={{
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              gap: 6, borderRadius: 8, padding: '9px 0', fontSize: 12, fontWeight: 500,
-              color: '#818cf8', border: '1px solid rgba(99,102,241,0.22)',
-              background: 'rgba(99,102,241,0.07)', cursor: 'pointer', transition: 'background 140ms, border-color 140ms',
+              gap: 6, borderRadius: 8, padding: '8px 0', fontSize: 12, fontWeight: 500,
+              color: '#818cf8', border: '1px solid rgba(99,102,241,0.2)',
+              background: 'rgba(99,102,241,0.06)', cursor: 'pointer',
+              transition: 'background 140ms, border-color 140ms',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(99,102,241,0.14)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.36)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(99,102,241,0.07)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.22)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(99,102,241,0.12)'
+              e.currentTarget.style.borderColor = 'rgba(99,102,241,0.35)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(99,102,241,0.06)'
+              e.currentTarget.style.borderColor = 'rgba(99,102,241,0.2)'
+            }}
           >
             <ExternalLink size={11} strokeWidth={2} />
             View Profile
@@ -266,27 +295,40 @@ function CreatorCard({
   )
 }
 
-// ── Empty state ────────────────────────────────────────────────────────────────
+// ── Empty state ───────────────────────────────────────────────────────────────
 function EmptyState({ onAdd }: { onAdd: () => void }) {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      justifyContent: 'center', padding: '80px 32px', gap: 16,
+      justifyContent: 'center', padding: '96px 32px', gap: 0,
       background: '#0f0f13', border: '1px solid rgba(255,255,255,0.055)',
       borderRadius: 14,
     }}>
       <div style={{
-        width: 48, height: 48, borderRadius: 12,
-        background: 'rgba(99,102,241,0.1)',
+        width: 56, height: 56, borderRadius: 16, marginBottom: 20,
+        background: 'linear-gradient(135deg, rgba(99,102,241,0.16) 0%, rgba(99,102,241,0.05) 100%)',
+        border: '1px solid rgba(99,102,241,0.2)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: '0 0 0 8px rgba(99,102,241,0.04)',
       }}>
-        <Users size={20} strokeWidth={1.5} style={{ color: '#818cf8' }} />
+        <Users size={22} strokeWidth={1.5} style={{ color: '#818cf8' }} />
       </div>
-      <div style={{ textAlign: 'center' }}>
-        <p style={{ fontSize: 14, fontWeight: 500, color: '#e4e4e7' }}>No creators yet</p>
-        <p style={{ marginTop: 6, fontSize: 13, color: '#52525b' }}>Add your first creator to build your network.</p>
-      </div>
-      <Button onClick={onAdd} style={{ background: '#6366f1', color: '#fff', marginTop: 4 }}>
+      <p style={{ fontSize: 15, fontWeight: 600, color: '#e4e4e7', marginBottom: 8, letterSpacing: '-0.01em' }}>
+        No creators yet
+      </p>
+      <p style={{ fontSize: 13, color: '#52525b', marginBottom: 24, textAlign: 'center', maxWidth: 280, lineHeight: 1.6 }}>
+        Add creators to your network to manage collaborations, track performance, and send payments.
+      </p>
+      <Button
+        onClick={onAdd}
+        style={{
+          background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+          color: '#fff',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.25)',
+          gap: 6,
+        }}
+      >
+        <UserPlus size={13} strokeWidth={2} />
         Add Creator
       </Button>
     </div>
@@ -325,10 +367,16 @@ export function CreatorsClient({ creators }: CreatorsClientProps) {
           </div>
           <Button
             onClick={openCreate}
-            className="gap-2 text-[13px] font-medium"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none', height: 38 }}
+            style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#fff',
+              gap: 6,
+              boxShadow: '0 1px 2px rgba(0,0,0,0.25)',
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.25), 0 0 0 3px rgba(99,102,241,0.25)' }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.25)' }}
           >
-            <UserPlus size={14} strokeWidth={2} />
+            <UserPlus size={13} strokeWidth={2} />
             Add Creator
           </Button>
         </div>
@@ -338,8 +386,15 @@ export function CreatorsClient({ creators }: CreatorsClientProps) {
           <EmptyState onAdd={openCreate} />
         ) : (
           <div className="creators-grid">
-            {creators.map((creator) => (
-              <CreatorCard key={creator.id} creator={creator} onEdit={openEdit} />
+            {creators.map((creator, i) => (
+              <motion.div
+                key={creator.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.055, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <CreatorCard creator={creator} onEdit={openEdit} />
+              </motion.div>
             ))}
           </div>
         )}

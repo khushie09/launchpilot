@@ -41,6 +41,7 @@ export default function ProductPreview() {
         paddingBottom: 60,
         position: 'relative',
         zIndex: 1,
+        overflow: 'hidden',
       }}
     >
 
@@ -151,7 +152,7 @@ export default function ProductPreview() {
                 ))}
               </div>
               <div
-                className="text-xs text-center"
+                className="text-xs text-center overflow-hidden text-ellipsis whitespace-nowrap"
                 style={{
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.06)',
@@ -161,7 +162,8 @@ export default function ProductPreview() {
                   paddingBottom: 3,
                   paddingLeft: 12,
                   paddingRight: 12,
-                  minWidth: 200,
+                  flex: 1,
+                  minWidth: 0,
                   marginLeft: 'auto',
                   marginRight: 'auto',
                   fontFamily: 'var(--font-geist-mono, monospace)',

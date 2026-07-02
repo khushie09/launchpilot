@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowRight, Menu, X } from 'lucide-react'
 import { Show, UserButton } from '@clerk/nextjs'
+import Link from 'next/link'
 
 const NAV_LINKS = ['Product', 'Pricing', 'Docs', 'Changelog']
 
@@ -44,7 +45,7 @@ export default function Navbar() {
         style={{ maxWidth: 1280, marginLeft: 'auto', marginRight: 'auto', height: 56 }}
       >
         {/* Brand */}
-        <a
+        <Link
           href="/"
           className="flex shrink-0 items-center select-none"
           style={{ gap: 10, textDecoration: 'none' }}
@@ -64,7 +65,7 @@ export default function Navbar() {
           >
             LaunchPilot
           </span>
-        </a>
+        </Link>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center" style={{ gap: 4 }}>
@@ -90,7 +91,7 @@ export default function Navbar() {
         {/* Actions */}
         <div className="flex items-center" style={{ gap: 8 }}>
           <Show when="signed-out">
-            <a
+            <Link
               href="/sign-in"
               className="hidden sm:block rounded-md transition-colors duration-150"
               style={{
@@ -103,10 +104,10 @@ export default function Navbar() {
               onMouseLeave={(e) => (e.currentTarget.style.color = '#71717a')}
             >
               Sign in
-            </a>
-            <a
+            </Link>
+            <Link
               href="/sign-up"
-              className="inline-flex items-center font-medium text-white transition-opacity hover:opacity-90"
+              className="hidden sm:inline-flex items-center font-medium text-white transition-opacity hover:opacity-90"
               style={{
                 background: '#3b82f6',
                 borderRadius: 8,
@@ -114,15 +115,16 @@ export default function Navbar() {
                 fontSize: 14,
                 gap: 6,
                 textDecoration: 'none',
+                whiteSpace: 'nowrap',
               }}
             >
               Get Started
               <ArrowRight size={13} strokeWidth={2.5} />
-            </a>
+            </Link>
           </Show>
 
           <Show when="signed-in">
-            <a
+            <Link
               href="/dashboard"
               className="hidden sm:block rounded-md transition-colors duration-150"
               style={{
@@ -135,7 +137,7 @@ export default function Navbar() {
               onMouseLeave={(e) => (e.currentTarget.style.color = '#71717a')}
             >
               Dashboard
-            </a>
+            </Link>
             <UserButton
               appearance={{
                 elements: {
@@ -238,15 +240,15 @@ export default function Navbar() {
                 style={{ borderTop: '1px solid #27272a', marginTop: 8, paddingTop: 8, gap: 8 }}
               >
                 <Show when="signed-out">
-                  <a
+                  <Link
                     href="/sign-in"
                     className="text-sm text-center"
                     style={{ color: '#71717a', padding: '10px', textDecoration: 'none' }}
                     onClick={() => setOpen(false)}
                   >
                     Sign in
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/sign-up"
                     className="inline-flex items-center justify-center font-medium text-white"
                     style={{
@@ -261,17 +263,17 @@ export default function Navbar() {
                   >
                     Get Started
                     <ArrowRight size={13} strokeWidth={2.5} />
-                  </a>
+                  </Link>
                 </Show>
                 <Show when="signed-in">
-                  <a
+                  <Link
                     href="/dashboard"
                     className="text-sm text-center"
                     style={{ color: '#71717a', padding: '10px', textDecoration: 'none' }}
                     onClick={() => setOpen(false)}
                   >
                     Dashboard
-                  </a>
+                  </Link>
                 </Show>
               </div>
             </div>

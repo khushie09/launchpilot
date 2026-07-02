@@ -136,12 +136,28 @@ export default async function AnalyticsPage() {
           {topMetrics.map((m) => {
             const Icon = m.icon
             return (
-              <div key={m.label} style={{ ...card, padding: '24px 28px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
+              <div
+                key={m.label}
+                className="kpi-card"
+                style={{
+                  ...card,
+                  padding: '24px 26px 22px',
+                  background: 'radial-gradient(ellipse at top left, rgba(99,102,241,0.05) 0%, transparent 55%), #0f0f13',
+                  transition: 'border-color 200ms, box-shadow 200ms',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
                   <p style={{ fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#52525b' }}>
                     {m.label}
                   </p>
-                  <Icon size={14} strokeWidth={1.8} style={{ color: '#3f3f46' }} />
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Icon size={13} strokeWidth={1.8} style={{ color: '#3f3f46' }} />
+                  </div>
                 </div>
                 <p style={{ fontSize: 32, fontWeight: 700, letterSpacing: '-0.03em', color: '#f4f4f5', lineHeight: 1 }}>
                   {m.value}
@@ -161,7 +177,7 @@ export default async function AnalyticsPage() {
         {/* Revenue + Campaigns charts */}
         <div className="chart-grid-2">
           <div style={card}>
-            <div style={{ padding: '24px 28px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ padding: '24px 28px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
               <p style={{ fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#52525b' }}>
                 Monthly Revenue
               </p>
@@ -175,7 +191,7 @@ export default async function AnalyticsPage() {
           </div>
 
           <div style={card}>
-            <div style={{ padding: '24px 28px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ padding: '24px 28px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
               <p style={{ fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#52525b' }}>
                 Campaigns Launched
               </p>
@@ -194,16 +210,25 @@ export default async function AnalyticsPage() {
 
           {/* Platform mix */}
           <div style={card}>
-            <div style={{ padding: '24px 28px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ padding: '24px 28px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
               <p style={{ fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#52525b' }}>
                 Platform Mix
               </p>
             </div>
             <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 24 }}>
               {!data || data.platformDistribution.length === 0 ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 0', gap: 10, color: '#3f3f46' }}>
-                  <BarChart3 size={16} strokeWidth={1.5} />
-                  <span style={{ fontSize: 13 }}>No campaigns yet</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0', gap: 10 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <BarChart3 size={18} strokeWidth={1.5} style={{ color: '#52525b' }} />
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: '#71717a' }}>No platform data yet</p>
+                    <p style={{ fontSize: 12, color: '#3f3f46', marginTop: 3 }}>Create campaigns to see platform breakdown</p>
+                  </div>
                 </div>
               ) : (
                 data.platformDistribution.map((p) => {
@@ -240,16 +265,25 @@ export default async function AnalyticsPage() {
 
           {/* Top campaigns by reach */}
           <div style={card}>
-            <div style={{ padding: '24px 28px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ padding: '24px 28px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
               <p style={{ fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#52525b' }}>
                 Top Campaigns by Reach
               </p>
             </div>
             <div style={{ padding: '12px 16px' }}>
               {!data || data.topByReach.length === 0 ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 0', gap: 10, color: '#3f3f46' }}>
-                  <BarChart3 size={16} strokeWidth={1.5} />
-                  <span style={{ fontSize: 13 }}>No reach data yet — set reach on campaigns</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 16px', gap: 10 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <BarChart3 size={18} strokeWidth={1.5} style={{ color: '#52525b' }} />
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: '#71717a' }}>No reach data yet</p>
+                    <p style={{ fontSize: 12, color: '#3f3f46', marginTop: 3 }}>Set reach values on campaigns to see rankings</p>
+                  </div>
                 </div>
               ) : (
                 data.topByReach.map((c, i) => (

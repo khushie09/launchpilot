@@ -33,8 +33,14 @@ export function DashboardHeader({ activeCampaigns }: DashboardHeaderProps) {
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
-          className="px-4"
-          style={{ background: '#6366f1', color: '#fff' }}
+          style={{
+            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+            color: '#fff',
+            gap: 6,
+            boxShadow: '0 1px 2px rgba(0,0,0,0.25)',
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.25), 0 0 0 3px rgba(99,102,241,0.25)' }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.25)' }}
         >
           New Campaign
         </Button>

@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <main style={{ position: 'relative', isolation: 'isolate' }}>
+      <main style={{ position: 'relative', isolation: 'isolate', overflowX: 'hidden' }}>
 
         {/* Grid — white lines, very faint so they read as texture not structure */}
         <div

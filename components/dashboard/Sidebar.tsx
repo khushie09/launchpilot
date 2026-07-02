@@ -30,7 +30,7 @@ export default function Sidebar() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    setMounted(true) // eslint-disable-line react-hooks/set-state-in-effect
     try {
       const stored = localStorage.getItem('lp-sidebar-collapsed')
       if (stored !== null) setCollapsed(stored === 'true')
